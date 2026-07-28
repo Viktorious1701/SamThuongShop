@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(uv run *)",
+      "Bash(rtk read *)",
+      "Bash(rtk ls *)",
+      "Bash(rtk grep *)",
+      "Bash(awk '/^\\(creative_tools|design_handoffs|doc_standards|persistent_facts|design_md_examples|experience_md_examples\\) =/{p=1} p{print} /\\\\]/{if\\(p\\)p=0}' .claude/skills/bmad-ux/customize.toml2)"
+    ]
+  }
+}
