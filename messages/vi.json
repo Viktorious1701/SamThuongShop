@@ -1,0 +1,57 @@
+{
+  "Nav": {
+    "wordmark": "Sâm Thương",
+    "home": "Trang chủ",
+    "shop": "Cửa hàng",
+    "portfolio": "Bộ sưu tập",
+    "about": "Giới thiệu",
+    "contact": "Liên hệ",
+    "cart": "Giỏ hàng",
+    "primaryNav": "Điều hướng chính"
+  },
+  "LanguageToggle": {
+    "en": "EN",
+    "vi": "VN",
+    "switchToEn": "Chuyển sang tiếng Anh",
+    "switchToVi": "Chuyển sang tiếng Việt"
+  },
+  "Footer": {
+    "tagline": "Nhiếp ảnh chim hoang dã Việt Nam — bản in và bản số, thực hiện theo yêu cầu.",
+    "trackOrder": "Theo dõi đơn hàng",
+    "rights": "© {year} Sâm Thương. Bảo lưu mọi quyền."
+  },
+  "HomePage": {
+    "heading": "Sâm Thương",
+    "subheading": "Nhiếp ảnh chim hoang dã Việt Nam — bản in và bản số, đặt in theo yêu cầu.",
+    "placeholder": "Trang chủ đầy đủ sẽ có trong các câu chuyện tiếp theo."
+  },
+  "ComingSoon": {
+    "note": "Sắp ra mắt — nội dung đầy đủ sẽ có trong các câu chuyện tiếp theo."
+  },
+  "Auth": {
+    "loginNav": "Đăng nhập",
+    "accountNav": "Tài khoản",
+    "logoutNav": "Đăng xuất",
+    "registerTitle": "Tạo tài khoản",
+    "registerCta": "Đăng ký",
+    "loginTitle": "Đăng nhập",
+    "loginCta": "Đăng nhập",
+    "accountTitle": "Tài khoản của tôi",
+    "signedInAs": "Đăng nhập với",
+    "emailLabel": "Email",
+    "passwordLabel": "Mật khẩu",
+    "nameLabel": "Tên (không bắt buộc)",
+    "required": "Bắt buộc",
+    "haveAccount": "Đã có tài khoản?",
+    "noAccount": "Chưa có tài khoản?",
+    "loginLink": "Đăng nhập",
+    "registerLink": "Đăng ký",
+    "invalidEmail": "Vui lòng nhập email hợp lệ.",
+    "passwordTooShort": "Mật khẩu phải có ít nhất 8 ký tự.",
+    "passwordTooLong": "Mật khẩu tối đa 72 ký tự.",
+    "nameTooLong": "Tên tối đa 120 ký tự.",
+    "emailTaken": "Email này đã được sử dụng.",
+    "invalidCredentials": "Email hoặc mật khẩu không đúng.",
+    "genericError": "Đã xảy ra lỗi. Vui lòng thử lại."
+  }
+}

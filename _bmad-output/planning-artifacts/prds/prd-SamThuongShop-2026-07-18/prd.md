@@ -40,14 +40,14 @@ Success looks like: a live catalog fellow bird lovers can browse on their phones
 - **UJ-1. Lan buys a framed-worthy print of a kingfisher.**
   - **Persona + context:** Lan, an amateur birdwatcher in Hanoi, follows Sam Thuong and wants one of his kingfisher shots on her wall.
   - **Entry state:** unauthenticated, on her phone, arriving from a social link to a product page.
-  - **Path:** she views the product, chooses the **Physical Print** option and a size, adds it to the **Cart**, checks out as a guest, enters her shipping address, and pays with Momo. `[ASSUMPTION: Momo is an accepted payment method.]`
+  - **Path:** she views the product, chooses the **Physical Print** option and a size, adds it to the **Cart**, checks out as a guest, enters her shipping address, and pays by scanning the **VietQR** code with her banking app. `[ASSUMPTION: VietQR (via the payOS gateway) is the primary electronic method for v1.]`
   - **Climax:** she sees an order confirmation with an order number and an estimated handling/shipping note; the value landed when she got a clear "we've got your order" screen and a confirmation message.
-  - **Resolution:** she waits for delivery; the operator sees the order and ships it. **Edge case:** if her Momo payment fails or she abandons it, the Order stays *Pending Payment* and is not fulfilled; she can return and pay again.
+  - **Resolution:** she waits for delivery; the operator sees the order and ships it. **Edge case:** if her VietQR payment fails or she abandons it, the Order stays *Pending Payment* and is not fulfilled; she can return and pay again.
 
 - **UJ-2. Minh buys and downloads a digital image for his desktop.**
   - **Persona + context:** Minh wants a high-resolution digital file of a specific heron photo, for personal use.
   - **Entry state:** unauthenticated, on desktop, browsing a Collection.
-  - **Path:** he opens the product, chooses the **Digital Download** option (seeing a watermarked preview), adds it to the cart, and checks out. `[ASSUMPTION: previews are watermarked; purchased downloads are not.]` He pays via ZaloPay or bank transfer.
+  - **Path:** he opens the product, chooses the **Digital Download** option (seeing a watermarked preview), adds it to the cart, and checks out. `[ASSUMPTION: previews are watermarked; purchased downloads are not.]` He pays by scanning the **VietQR** code.
   - **Climax:** after payment is confirmed, he receives a secure download link and gets the file; value landed the moment the download starts.
   - **Resolution:** he can re-download the file (for a limited window, or from an account if he made one). **Edge case:** if the download link expires, he can request a fresh link or re-download from his account. `[ASSUMPTION: re-download is available via account and/or a time-limited link.]`
 
@@ -73,7 +73,7 @@ Success looks like: a live catalog fellow bird lovers can browse on their phones
 - **Gallery** — a set of images within the Portfolio, presented for viewing (not necessarily for sale).
 - **Download Link** — a secured, time-limited URL that delivers a purchased Digital Download file.
 - **License** — the usage terms granted with a Digital Download (personal, non-commercial use in v1).
-- **Payment Method** — a way the Customer pays: Momo, ZaloPay, bank transfer, or Cash on Delivery (COD). `[ASSUMPTION: this set of methods.]`
+- **Payment Method** — a way the Customer pays: **VietQR** bank transfer (via the payOS gateway) or **Cash on Delivery (COD)**. Momo/ZaloPay wallets are deferred post-launch (they require business registration). `[ASSUMPTION: VietQR + COD for v1.]`
 
 ## 4. Features
 
@@ -163,7 +163,7 @@ A Customer sees an itemized total (items + shipping, if any) in VND before payin
 
 ### 4.3 Payments
 
-**Description:** Checkout collects payment via local Vietnamese Payment Methods. Card data and payment credentials are handled by the payment provider, not stored by SamThuongShop. `[ASSUMPTION: payment methods are Momo, ZaloPay, bank transfer, and COD for physical orders; exact providers confirmed in architecture.]`
+**Description:** Checkout collects payment via local Vietnamese Payment Methods. Card data and payment credentials are handled by the payment provider, not stored by SamThuongShop. `[ASSUMPTION: v1 payment methods are VietQR (via payOS) + COD for physical orders; Momo/ZaloPay wallets deferred — architecture-confirmed.]`
 
 **Functional Requirements:**
 
@@ -173,13 +173,13 @@ A Customer can pay for an Order using a supported Payment Method.
 
 **Consequences (testable):**
 - The Customer can select among the enabled Payment Methods at checkout.
-- On successful online payment (Momo/ZaloPay), the Order moves to *Paid* (or *Processing*); on failure or abandonment it remains *Pending Payment* and is not fulfilled.
+- On successful VietQR payment (confirmed by the payOS gateway webhook), the Order moves to *Paid*; on failure or abandonment it remains *Pending Payment* and is not fulfilled.
 - COD is offered only for Orders that contain a Physical Print **and no Digital Download** (so digital delivery is never gated behind courier cash collection). `[ASSUMPTION: COD is physical-only and excludes mixed carts with digital items.]`
 - A COD Order is placed as *Processing* and the Operator marks it *Paid* upon confirmed cash receipt.
 
 #### FR-9: Bank-transfer confirmation
 
-For bank transfer, the Customer receives payment instructions and the Order is held until payment is confirmed.
+For VietQR, the Customer is shown a QR code to scan with their banking app; the Order is confirmed *Paid* automatically when the payOS webhook reports the transfer.
 
 **Consequences (testable):**
 - The Customer is shown the transfer details and a reference for their Order.
@@ -358,7 +358,7 @@ A Customer can create and sign in to an Account.
 
 - Catalog & storefront with Collections, product detail, and bilingual language toggle (FR-1–FR-3, FR-25).
 - Cart and guest/account checkout with conditional shipping (FR-4–FR-7).
-- Local Payment Methods incl. bank transfer and COD-for-physical (FR-8–FR-9).
+- VietQR (via payOS) and COD-for-physical payment methods (FR-8–FR-9). Momo/ZaloPay wallets deferred post-launch.
 - Orders with status tracking and manual physical fulfillment (FR-10–FR-12).
 - Automated, secured Digital Download delivery + re-download + personal-use License (FR-13–FR-15).
 - Portfolio galleries, About, and contact (FR-16–FR-18).
@@ -395,7 +395,7 @@ A Customer can create and sign in to an Account.
 
 ## 8. Open Questions
 
-1. **Payment providers** — confirm Momo + ZaloPay + bank transfer + COD, and which specific gateway/integration. (Drives FR-8, FR-9.)
+1. **Payment providers** — *RESOLVED in architecture:* v1 = **payOS (VietQR) + COD**. Momo/ZaloPay wallet balances need business registration + a VNPay/OnePay contract, so they are **deferred post-launch**.
 2. **Shipping-rate model** — flat fee, weight-based, or per-region? Who bears cost? (Drives FR-6, FR-7.)
 3. **Digital Download policy** — link expiry window and download-count limits; exact License wording. (Drives FR-13, FR-15.)
 4. **Print sizes / digital tiers** — the concrete Variant options Sam Thuong wants to offer.
@@ -405,7 +405,7 @@ A Customer can create and sign in to an Account.
 *Every `[ASSUMPTION]` from the document, for explicit confirmation:*
 
 - §2.1/§2.2 — SamThuongShop sells exclusively Sam Thuong's work in v1 (single-artist, not a marketplace).
-- §2.3/§4.3 — Accepted Payment Methods are Momo, ZaloPay, bank transfer, and COD (physical-only).
+- §2.3/§4.3 — v1 Payment Methods are VietQR (via payOS) + COD (physical-only); Momo/ZaloPay wallets deferred post-launch.
 - §2.3/§4.1 — Digital previews are watermarked; purchased downloads are un-watermarked.
 - §2.3/§4.5 — Re-download is available via Account and/or a fresh time-limited Download Link.
 - §3 — The Order Status set is *Pending Payment / Paid / Processing / Shipped / Completed / Cancelled* (refine in UX).

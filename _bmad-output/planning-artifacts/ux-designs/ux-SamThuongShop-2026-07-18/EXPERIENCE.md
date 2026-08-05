@@ -106,7 +106,7 @@ Behavioral only — every visual spec (fill, radius, type ramp) lives in `DESIGN
 | **Variant selector** | Two axes on a dual Product: **Physical Print size** (A4 / A3 / A2) and **Digital tier** (**Web-res / Print-res**) `[ASSUMPTION: exact tier names/count pending PRD Open Question 4]`. Selecting a Variant **updates the displayed price** and **updates shipping applicability**: choosing a Physical Print marks the line shipping-relevant; choosing a Digital Download marks it shipping-exempt and pins **quantity to 1**. Unpublished Products never render this control. |
 | **Watermarked preview** | Digital tiers display a **watermarked** image only; the un-watermarked file is never delivered to the client before purchase (FR-2, counter-metric SM-C2). Lightbox-zoomable but still watermarked. Physical Prints show the clean display image (the deliverable is the print, not the file). |
 | **Cart line** | Shows thumbnail, name, Variant label, unit price, qty stepper, line total (VND). **Digital lines lock qty at 1** — the stepper is disabled with the note "Digital images are sold once per order" / "Ảnh số chỉ bán một bản mỗi đơn". Remove control per line; removing the last line → empty-cart state. |
-| **Checkout payment selector** | Radio set of enabled methods: Momo, ZaloPay, bank transfer, COD. **Hides the shipping step entirely** for digital-only carts (FR-6). **Disables COD** for any cart containing a Digital Download, with an inline reason: "COD isn't available for digital images" / "COD không áp dụng cho ảnh số" (FR-8). Bank transfer reveals transfer instructions + Order reference on submit. |
+| **Checkout payment selector** | Radio set of enabled methods: **VietQR (payOS)** and **COD** (Momo/ZaloPay wallets deferred post-launch). **Hides the shipping step entirely** for digital-only carts (FR-6). **Disables COD** for any cart containing a Digital Download, with an inline reason: "COD isn't available for digital images" / "COD không áp dụng cho ảnh số" (FR-8). VietQR shows a QR code + Order reference on submit; the Order auto-confirms *Paid* via the payOS webhook. |
 | **Status pill** | Compact pill on `{colors.surface-sunken}` with a **leading colored dot + an `{colors.ink}` label** (the label is never the status hue — that fails AA on the sunken pill; the dot carries the color). Dot maps 1:1 to Order Status: `{colors.success}` = Paid/Completed; `{colors.pending}` = Pending Payment / Awaiting transfer / Processing; `{colors.info}` = Shipped; `{colors.error}` = Cancelled/Failed. The label text is bilingual per the toggle and carries the meaning for colorblind users (never color alone). |
 | **Gallery grid** | Masonry/asymmetric grid of portfolio images. Tap/click opens a **lightbox** (overlay uses `{shadows.overlay}`); arrow keys and swipe move between images, `Esc` closes. If an image is linked to a Product, the lightbox shows a "View this print" / "Xem bản in này" action → Product detail. Not all gallery images are for sale. |
 | **Forms** | (register, login, address, contact, guest order-lookup) Every field has a visible label (never placeholder-only). Inline validation on blur and on submit; errors sit beneath the field in `{colors.error}` with text, not color alone. Primary submit uses `{colors.sky-deep}`; disabled while a required field is invalid or a request is in flight. |
@@ -120,7 +120,7 @@ Status colors are used semantically: `{colors.success}` (delivered/paid), `{colo
 | **Empty cart** | Cart | "Your cart is empty" / "Giỏ hàng của bạn đang trống", quiet illustration, single link → Shop ("Continue shopping" / "Tiếp tục mua sắm"). Never a dead end. |
 | **Loading (image-heavy)** | Home, Catalog, Collection, Portfolio | Skeleton blocks sized to the grid resolve into images; images lazy-load below the fold with low-quality placeholders → full asset (see Responsive). Layout never reflows/jumps as images arrive (reserved aspect ratios). |
 | **Made-to-order availability** | Product detail, Product card | Physical Prints are **always purchasable while published** — copy is "Made to order" / "Đặt in theo yêu cầu" with a handling note, **never "out of stock"** and never a stock count (FR-2). Unpublished Products simply do not appear. |
-| **Payment pending — bank transfer** | Order confirmation, Order status | Order Status = *Pending Payment*, status pill "Awaiting transfer" / "Chờ chuyển khoản" in `{colors.pending}`. Transfer details + Order reference shown; copy states the Order is held until the Operator confirms (FR-9). Nothing is delivered/shipped yet. |
+| **Payment pending — bank transfer** | Order confirmation, Order status | Order Status = *Pending Payment*, status pill "Awaiting transfer" / "Chờ chuyển khoản" in `{colors.pending}`. VietQR code + Order reference shown; the Order is held until the payOS webhook confirms the transfer (usually seconds), then flips to *Paid* (FR-9). Nothing is delivered/shipped until *Paid*. |
 | **Payment placed — COD** | Order confirmation, Order status | Physical-only COD Order is placed as *Processing*; pill "Processing" / "Đang xử lý". Copy: pay the courier on delivery; Operator marks Paid on cash receipt (FR-8). |
 | **Payment failed / abandoned** | Return to Order status / Checkout | Order **stays *Pending Payment*** and is not fulfilled (UJ-1 edge). Message in `{colors.error}`: "Payment didn't complete — your order is saved. Try again." / "Thanh toán chưa hoàn tất — đơn hàng đã được lưu. Vui lòng thử lại." with a resume-payment action. No duplicate Order created on retry. |
 | **Digital delivery success** | Order confirmation, email, Account | On *Paid*, "Your download is ready" / "Ảnh đã sẵn sàng để tải về" in `{colors.success}`; secure Download Link on-screen and by email. Digital-only Order shows *Completed* once the link is issued (FR-13). |
@@ -155,7 +155,7 @@ Behavioral floor; visual contrast is proven in `DESIGN.md`. **All text/CTA token
 
 Named-protagonist journeys mirroring PRD UJ-1, UJ-2, UJ-3 verbatim in intent.
 
-### Flow 1 — Lan buys a framed-worthy kingfisher print, pays with Momo (UJ-1)
+### Flow 1 — Lan buys a framed-worthy kingfisher print, pays by VietQR (UJ-1)
 
 **Entry state:** Lan, an amateur birdwatcher in Hanoi, unauthenticated, on her phone, arriving from a social link straight to a **Product detail** page.
 
@@ -164,10 +164,10 @@ Named-protagonist journeys mirroring PRD UJ-1, UJ-2, UJ-3 verbatim in intent.
 3. She taps **Add to cart** / **Thêm vào giỏ**; a toast confirms and the cart indicator ticks to 1.
 4. She opens the **Cart**, sees the A3 print line and VND total, taps **Checkout**.
 5. She checks out **as a guest** (FR-5), enters her shipping address (required — cart holds a print, FR-6).
-6. Order summary shows item subtotal + flat shipping fee + grand total in VND (FR-7). She selects **Momo** and pays.
+6. Order summary shows item subtotal + flat shipping fee + grand total in VND (FR-7). She selects **VietQR**, scans the QR with her banking app, and pays.
 7. **CLIMAX:** the **Order confirmation** appears — "Order confirmed" / "Đã xác nhận đơn hàng" with a unique **order number** and a handling/shipping note; the same lands in her email. The "we've got your order" moment is where the value lands.
 8. **Resolution:** she waits for delivery; the Operator sees the Order and ships it (admin, FR-11).
-- **Edge case:** if her Momo payment fails or she abandons it, the Order **stays *Pending Payment*** and is not fulfilled; she returns via the confirmation/status link and pays again — no duplicate Order.
+- **Edge case:** if her VietQR payment fails or she abandons it, the Order **stays *Pending Payment*** and is not fulfilled; she returns via the confirmation/status link and pays again — no duplicate Order.
 
 *Surfaces:* 4 → 5 → 6 → 7 (→ 8). *Components:* variant selector, cart line, checkout payment selector, status pill.
 
@@ -178,7 +178,7 @@ Named-protagonist journeys mirroring PRD UJ-1, UJ-2, UJ-3 verbatim in intent.
 1. He opens a **Product detail** for "Grey Heron in Mist" / "Diệc xám trong sương", Tràm Chim National Park, and sees a **watermarked preview**.
 2. He selects **Digital Download · Print-res** (650.000₫); qty is pinned to 1; the shipping applicability flips off. The **personal-use License** is shown on the page (FR-15).
 3. He adds it to the cart and goes to **Checkout**. Because the cart is digital-only, the **shipping step is hidden** and **COD is disabled** (FR-6, FR-8).
-4. He pays via **ZaloPay** (or bank transfer — which would hold the Order at *Awaiting transfer* until the Operator confirms, FR-9).
+4. He pays by **VietQR** (scan-to-pay); the Order auto-confirms *Paid* via the payOS webhook (FR-9).
 5. On payment confirmed, the Order reaches *Paid* and the digital-only Order moves to *Completed*.
 6. **CLIMAX:** "Your download is ready" / "Ảnh đã sẵn sàng để tải về" in `{colors.success}`; a **secure, time-limited Download Link** appears on-screen and by email, and the download of the **un-watermarked** file begins. Value lands the moment the download starts.
 7. **Resolution:** he can re-download within the link window, or from his **Account** if he created one (FR-14).

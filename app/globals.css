@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+/*
+ * Sky & Sedge design tokens (Story 1.2).
+ * Source of truth: _bmad-output/planning-artifacts/ux-designs/.../DESIGN.md
+ * All values below are verbatim from the story's Dev Notes — do not invent.
+ */
+@theme {
+  /* Colors — 15 tokens. `soft` variants are decorative/large-area only,
+     never text (they do not pass AA as text on cream/white). */
+  --color-bg-page: #fbf9f4;
+  --color-surface: #ffffff;
+  --color-surface-sunken: #f1ede4;
+  --color-border: #e4dfd3;
+  --color-ink: #3b4147;
+  --color-ink-muted: #6b7178;
+  --color-caption-deep: #71736b;
+  --color-sky-soft: #7e9aab;
+  --color-sky-deep: #4c6577;
+  --color-sage-soft: #8b9b7a;
+  --color-sage-deep: #5e6f4b;
+  --color-success: #4f7a52;
+  --color-pending: #96681f;
+  --color-error: #a85248;
+  --color-info: #4c6577;
+
+  /* Radius — md is the default `rounded` utility. */
+  --radius-sm: 2px;
+  --radius-md: 6px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+  --radius: var(--radius-md);
+
+  /* Spacing — Tailwind's default 4px base scale (--spacing: 0.25rem, inherited
+     from the Tailwind preset) already yields 4/8/12/16/24/32/48/64/96 via the
+     numeric scale (1,2,3,4,6,8,12,16,24). Named tokens add the semantic ones. */
+  --spacing-gutter: 24px;
+  --spacing-margin-mobile: 20px;
+  --spacing-margin-desktop: 32px;
+  --spacing-max-content: 1200px;
+
+  /* Shadow — the only shadow in the system; reserved for transient overlays. */
+  --shadow-overlay: 0 6px 24px -8px rgba(59, 65, 71, 0.18);
+}
+
+/* Font CSS variables come from next/font (see app/layout.tsx), which exposes
+   them on <html> as --lora-font / --inter-font. Alias them into Tailwind's
+   `--font-*` namespace with `@theme inline` so the utilities (`font-lora`,
+   `font-inter`) stay in sync with the runtime-generated font-family value. */
+@theme inline {
+  --font-lora: var(--lora-font);
+  --font-inter: var(--inter-font);
+}
+
+/* Type ramp — 7-role scale pairing family + size + weight + line-height +
+   tracking per DESIGN.md. Headings (display/h1/h2/h3) are always Lora;
+   body/caption are always Inter — the two families never swap roles. */
+@utility text-display {
+  font-family: var(--font-lora);
+  font-weight: 700;
+  font-size: 56px;
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+}
+
+@utility text-h1 {
+  font-family: var(--font-lora);
+  font-weight: 700;
+  font-size: 40px;
+  line-height: 1.15;
+  letter-spacing: -0.005em;
+}
+
+@utility text-h2 {
+  font-family: var(--font-lora);
+  font-weight: 600;
+  font-size: 30px;
+  line-height: 1.2;
+}
+
+@utility text-h3 {
+  font-family: var(--font-lora);
+  font-weight: 600;
+  font-size: 22px;
+  line-height: 1.3;
+}
+
+@utility text-body-lg {
+  font-family: var(--font-inter);
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.65;
+}
+
+@utility text-body {
+  font-family: var(--font-inter);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+@utility text-caption {
+  font-family: var(--font-inter);
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 1.45;
+  letter-spacing: 0.02em;
+}
+
+body {
+  background: var(--color-bg-page);
+  color: var(--color-ink);
+  font-family: var(--font-inter);
+}

@@ -1,0 +1,57 @@
+{
+  "Nav": {
+    "wordmark": "Sâm Thương",
+    "home": "Home",
+    "shop": "Shop",
+    "portfolio": "Portfolio",
+    "about": "About",
+    "contact": "Contact",
+    "cart": "Cart",
+    "primaryNav": "Primary navigation"
+  },
+  "LanguageToggle": {
+    "en": "EN",
+    "vi": "VN",
+    "switchToEn": "Switch to English",
+    "switchToVi": "Switch to Vietnamese"
+  },
+  "Footer": {
+    "tagline": "Vietnamese wildlife bird photography — prints and digital downloads, made to order.",
+    "trackOrder": "Track your order",
+    "rights": "© {year} Sâm Thương. All rights reserved."
+  },
+  "HomePage": {
+    "heading": "Sâm Thương",
+    "subheading": "Vietnamese wildlife bird photography — prints and digital downloads, made to order.",
+    "placeholder": "The full home page arrives in a later story."
+  },
+  "ComingSoon": {
+    "note": "Coming soon — full content arrives in a later story."
+  },
+  "Auth": {
+    "loginNav": "Login",
+    "accountNav": "Account",
+    "logoutNav": "Logout",
+    "registerTitle": "Create an account",
+    "registerCta": "Register",
+    "loginTitle": "Log in",
+    "loginCta": "Log in",
+    "accountTitle": "My account",
+    "signedInAs": "Signed in as",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "nameLabel": "Name (optional)",
+    "required": "Required",
+    "haveAccount": "Already have an account?",
+    "noAccount": "Don't have an account?",
+    "loginLink": "Log in",
+    "registerLink": "Register",
+    "invalidEmail": "Enter a valid email address.",
+    "passwordTooShort": "Password must be at least 8 characters.",
+    "passwordTooLong": "Password must be at most 72 characters.",
+    "nameTooLong": "Name must be at most 120 characters.",
+    "emailTaken": "An account with this email already exists.",
+    "invalidCredentials": "Incorrect email or password.",
+    "genericError": "Something went wrong. Please try again."
+  }
+}
