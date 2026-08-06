@@ -10,11 +10,13 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { TextField } from "@/components/form/text-field";
 import { SubmitButton } from "@/components/form/submit-button";
-import { loginAction, initialLoginState } from "./actions";
+import { loginAction, type LoginState } from "./actions";
+
+const initialState: LoginState = { status: "idle" };
 
 export function LoginForm() {
   const t = useTranslations("Auth");
-  const [state, formAction] = useActionState(loginAction, initialLoginState);
+  const [state, formAction] = useActionState(loginAction, initialState);
 
   return (
     <form action={formAction} className="space-y-6" noValidate>

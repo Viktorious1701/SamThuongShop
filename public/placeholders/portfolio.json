@@ -1,0 +1,110 @@
+[
+  {
+    "file": "portfolio/bird-01.jpg",
+    "species_en": "Common Kingfisher",
+    "species_vi": "Bói cá lam",
+    "location": "Tràm Chim",
+    "date": "2026",
+    "orientation": "landscape",
+    "collection": "Wetlands"
+  },
+  {
+    "file": "portfolio/bird-02.jpg",
+    "species_en": "Grey Heron",
+    "species_vi": "Diệc xám",
+    "location": "Xuân Thủy",
+    "date": "2026",
+    "orientation": "portrait",
+    "collection": "Wetlands"
+  },
+  {
+    "file": "portfolio/bird-03.jpg",
+    "species_en": "Sarus Crane",
+    "species_vi": "Sếu đầu đỏ",
+    "location": "Tràm Chim",
+    "date": "2026",
+    "orientation": "landscape",
+    "collection": "Wetlands"
+  },
+  {
+    "file": "portfolio/bird-04.jpg",
+    "species_en": "Painted Stork",
+    "species_vi": "Cò nhạn",
+    "location": "U Minh Thượng",
+    "date": "2026",
+    "orientation": "square",
+    "collection": "Wetlands"
+  },
+  {
+    "file": "portfolio/bird-05.jpg",
+    "species_en": "Oriental Dwarf Kingfisher",
+    "species_vi": "Bồng chanh đỏ",
+    "location": "Cát Tiên",
+    "date": "2026",
+    "orientation": "portrait",
+    "collection": "Forest"
+  },
+  {
+    "file": "portfolio/bird-06.jpg",
+    "species_en": "Red-whiskered Bulbul",
+    "species_vi": "Chào mào",
+    "location": "Cát Tiên",
+    "date": "2026",
+    "orientation": "landscape",
+    "collection": "Forest"
+  },
+  {
+    "file": "portfolio/bird-07.jpg",
+    "species_en": "Black-crowned Night Heron",
+    "species_vi": "Vạc",
+    "location": "Xuân Thủy",
+    "date": "2026",
+    "orientation": "square",
+    "collection": "Wetlands"
+  },
+  {
+    "file": "portfolio/bird-08.jpg",
+    "species_en": "Little Egret",
+    "species_vi": "Cò trắng",
+    "location": "Đồng Tháp",
+    "date": "2026",
+    "orientation": "landscape",
+    "collection": "Wetlands"
+  },
+  {
+    "file": "portfolio/bird-09.jpg",
+    "species_en": "Purple Heron",
+    "species_vi": "Diệc lửa",
+    "location": "Tràm Chim",
+    "date": "2026",
+    "orientation": "portrait",
+    "collection": "Wetlands"
+  },
+  {
+    "file": "portfolio/bird-10.jpg",
+    "species_en": "Oriental Magpie-Robin",
+    "species_vi": "Chích chòe than",
+    "location": "Cát Tiên",
+    "date": "2026",
+    "orientation": "landscape",
+    "collection": "Forest"
+  },
+  {
+    "file": "portfolio/bird-11.jpg",
+    "species_en": "White-throated Kingfisher",
+    "species_vi": "Sả đầu nâu",
+    "location": "Đồng Tháp",
+    "date": "2026",
+    "orientation": "square",
+    "collection": "Kingfishers"
+  },
+  {
+    "file": "portfolio/bird-12.jpg",
+    "species_en": "White-breasted Waterhen",
+    "species_vi": "Cuốc ngực trắng",
+    "location": "Gò Công",
+    "date": "2026",
+    "orientation": "landscape",
+    "collection": "Wetlands"
+  }
+]

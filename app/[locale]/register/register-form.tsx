@@ -12,14 +12,13 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { TextField } from "@/components/form/text-field";
 import { SubmitButton } from "@/components/form/submit-button";
-import { registerAction, initialRegisterState } from "./actions";
+import { registerAction, type RegisterState } from "./actions";
+
+const initialState: RegisterState = { status: "idle" };
 
 export function RegisterForm() {
   const t = useTranslations("Auth");
-  const [state, formAction] = useActionState(
-    registerAction,
-    initialRegisterState,
-  );
+  const [state, formAction] = useActionState(registerAction, initialState);
 
   return (
     <form action={formAction} className="space-y-6" noValidate>

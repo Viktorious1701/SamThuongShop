@@ -89,6 +89,32 @@ export async function createUser(input: {
   }
 }
 
+/**
+ * Upserts a User with the given role (Story 1.5 — operator seed). Hashes
+ * the password every run and rewrites it on top of an existing row, so the
+ * seed stays idempotent while still enforcing the current env password.
+ * The only caller today is `prisma/seed.ts`; kept here (not in the seed
+ * script) so it's `lib/server` that hashes/touches Prisma, per AD-2.
+ */
+export async function upsertUserWithRole(input: {
+  email: string;
+  password: string;
+  role: string;
+  name?: string | null;
+}): Promise<SafeUser> {
+  const email = input.email.toLowerCase();
+  const passwordHash = await bcrypt.hash(input.password, BCRYPT_SALT_ROUNDS);
+  const name = input.name?.trim() ? input.name.trim() : null;
+
+  const user = await prisma.user.upsert({
+    where: { email },
+    update: { passwordHash, role: input.role, name },
+    create: { email, passwordHash, role: input.role, name },
+  });
+
+  return toSafeUser(user);
+}
+
 /** Narrow check for Prisma's unique-constraint violation (P2002) without
  * importing Prisma's error classes into every caller. */
 function isUniqueConstraintError(error: unknown): boolean {

@@ -60,10 +60,63 @@ so that I can see my orders and re-download purchases later. *(FR-24)*
 
 ### Agent Model Used
 
-Claude Sonnet (to be filled by the dev agent)
+Claude Sonnet
 
 ### Debug Log References
 
+- `npx prisma migrate dev --name init_user` → applied `20260805023008_init_user` to Supabase via `DIRECT_URL` (session pooler, 5432). Verified with a raw `pg` query against `information_schema.columns` and `prisma migrate status` (via `rtk proxy` to bypass the token-saving CLI wrapper's summarized output) — table exists with the exact columns/defaults from the schema.
+- `npx tsc --noEmit` → 0 errors (after deleting a stale/corrupted `.next/dev/types/validator.ts` from a prior build, and fixing one control-flow narrowing issue in `account/page.tsx`).
+- `npm run lint` → clean, exit 0.
+- `npm run build` → succeeds (Turbopack, Next.js 16.3.0); all 11 routes compile, including `/api/auth/[...nextauth]`, `/[locale]/{register,login,account}`.
+- Live round-trip verified twice: once with disposable `test+<timestamp>@example.com` addresses via a temporary Playwright script (installed `playwright` as a dev dependency for this verification only, then `npm uninstall playwright` afterward — it is not part of the shipped dependency tree), and once with the literal `test@example.com` / `TestPass123!` named in the task brief. Both flows: register → auto-signed-in → redirected to `/account` showing the email → nav shows "Tài khoản"/"Đăng xuất" → logout → nav reverts to "Đăng nhập" → `/account` redirects to `/login` when signed out → log back in → `/account` shows the email again.
+- Verified `test@example.com`'s stored hash directly in Supabase: `passwordHash` = `$2b$12$WN1WDKPHLwbE3Axe4AIp7OG3uq/a42J.6pv/o14EkrrZCIbPdv5fm` (bcrypt, 12 rounds — never plaintext), `role` = `customer` (default).
+- Verified error paths: re-registering an already-used email returns the `emailTaken` inline field error (no crash, no duplicate row); wrong password on login returns the generic `invalidCredentials` form error (no session created); submitting either form empty returns `required` as inline text under each field.
+- One real bug caught during verification: Auth.js v5's "use server" convention requires every export from an actions file to be an async function. The first draft exported `initialRegisterState`/`initialLoginState` plain objects alongside the actions, which broke with "A 'use server' file can only export async functions, found object." Fixed by moving the initial `useActionState` value into the client form components and keeping the actions files to function + type-only exports.
+- `/api/health` → `{"ok":true}` against the real Supabase DB (transaction pooler, `DATABASE_URL`) both before and after this story's changes.
+- `/vi`, `/en`, `/styleguide`, `/vi/login`, `/en/login`, `/vi/register`, `/en/register` all return 200; `/vi/account` and `/en/account` return a 307 redirect to `/login` when signed out, as intended.
+
 ### Completion Notes List
 
+- **next-auth version used:** `next-auth@5.0.0-beta.32` (Auth.js v5, `next-auth@beta` tag at time of implementation).
+- **Test user created for the round-trip:** `test@example.com` / `TestPass123!` (plus several disposable `test+<timestamp>@example.com` addresses used during automated verification — all left in Supabase; they are harmless placeholder rows).
+- Implemented Tasks 1–5 per the story (Task 0 — the Supabase/`adapter-pg` swap — was already done and was **not** touched: `lib/server/db.ts`, `prisma.config.ts`, and the `.env` connection strings are unmodified).
+- `User` model added to `prisma/schema.prisma` exactly as specified (`id` cuid, `email` unique, `passwordHash`, `name?`, `role` default `"customer"`, `createdAt`/`updatedAt`); migration `20260805023008_init_user` applied to Supabase.
+- `auth.ts` (root): Credentials provider, JWT session strategy, `jwt`/`session` callbacks add `userId`/`role`; `authorize()` delegates to `lib/server/user.ts#authenticateUser` (find by email + `bcrypt.compare`). Added `next-auth.d.ts` module augmentation for typed `session.user.id`/`role` and `token.userId`/`role`. `app/api/auth/[...nextauth]/route.ts` re-exports `handlers.GET`/`POST`.
+- `AUTH_SECRET` generated with `openssl rand -base64 33` (the `npx auth secret` command resolved to an unrelated `auth` CLI package and was not used) and added to `.env` only — no DB connection strings touched.
+- Registration is a Server Action (`app/[locale]/register/actions.ts`) that zod-validates input, calls `lib/server/user.ts#createUser` (bcrypt hash, 12 rounds; Prisma `P2002` mapped to a graceful `emailTaken` field error), then auto-signs-in via `signIn("credentials", …)` and redirects to `/account`. All Prisma access and password hashing/verification live only in `lib/server/user.ts` (AD-2); `auth.ts` and the Server Actions never import Prisma or `bcryptjs` directly.
+- Login is a parallel Server Action (`app/[locale]/login/actions.ts`) that validates then calls `signIn`; any `AuthError` (wrong credentials) becomes a generic `invalidCredentials` message — never reveals whether the email exists.
+- Logout is a single shared Server Action (`lib/actions/auth-actions.ts#logoutAction`) used both by the nav's Logout button and the `/account` page's logout button — a plain `<form action={...}>`, no client JS required.
+- UI: `TextField` (`components/form/text-field.tsx`) implements the `text-input` DESIGN.md token — surface field, 1px ink-muted border (2px sky-deep focus ring, inset so it never shifts layout), error state swaps the border to `error` and renders the message as text + a non-color icon beneath the field, `aria-invalid`/`aria-describedby` wired up. Required fields show a non-color "(Bắt buộc)"/"(Required)" marker next to the label plus `aria-required`. `SubmitButton` implements `button-primary` (pill, sky-deep fill, `ink` focus ring per the token spec — a same-hue ring on a sky-deep button is explicitly forbidden by DESIGN.md).
+- `/account` guards itself at the page level (`auth()` → `redirect({ href: "/login", locale })` from `i18n/navigation`) — `proxy.ts` was not touched, per the Dev Notes.
+- `components/site-nav.tsx` now reads `auth()` and shows "Login" when signed out, or "Account" + a Logout button when signed in, alongside the existing Home/Shop/Portfolio/About/Contact links and language toggle.
+- Added an `Auth` namespace to both `messages/en.json` and `messages/vi.json` (nav labels, form labels, required marker, and every validation/error message used by the two forms).
+- Deviation from a literal reading of the task list: `initialRegisterState`/`initialLoginState` were **not** exported from the `"use server"` action files (Next.js forbids non-function exports there); they're defined locally in the client form components instead. Everything else matches the brief.
+- Out of scope, confirmed not built: operator-role gating/admin shell (1.5), products/cart/orders, password reset, OAuth/social login.
+
 ### File List
+
+**New files**
+- `auth.ts`
+- `next-auth.d.ts`
+- `app/api/auth/[...nextauth]/route.ts`
+- `lib/server/user.ts`
+- `lib/validation/auth-schemas.ts`
+- `lib/actions/auth-actions.ts`
+- `components/form/text-field.tsx`
+- `components/form/submit-button.tsx`
+- `components/logout-button.tsx`
+- `app/[locale]/register/page.tsx`
+- `app/[locale]/register/register-form.tsx`
+- `app/[locale]/register/actions.ts`
+- `app/[locale]/login/page.tsx`
+- `app/[locale]/login/login-form.tsx`
+- `app/[locale]/login/actions.ts`
+- `app/[locale]/account/page.tsx`
+- `prisma/migrations/20260805023008_init_user/migration.sql`
+
+**Modified files**
+- `prisma/schema.prisma` (added `User` model)
+- `components/site-nav.tsx` (Login / Account + Logout)
+- `messages/en.json`, `messages/vi.json` (added `Auth` namespace)
+- `.env` (added `AUTH_SECRET` only — DB connection strings untouched)
+- `package.json` / `package-lock.json` (added `next-auth`, `bcryptjs`, `zod`; `playwright` was added and removed again, verification-only)

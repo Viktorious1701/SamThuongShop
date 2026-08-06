@@ -24,7 +24,9 @@ export type RegisterState = {
   formError?: string;
 };
 
-export const initialRegisterState: RegisterState = { status: "idle" };
+// NOTE: a "use server" file may only export async functions — the initial
+// useActionState value is a plain object, so it lives in the client form
+// component instead of here.
 
 export async function registerAction(
   _prevState: RegisterState,

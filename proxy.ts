@@ -8,8 +8,9 @@
 // uses to keep `npm run build` warning-free (Story 1.3, AC-6).
 //
 // Matcher excludes /api/*, /_next/*, /_vercel/*, static files (anything with
-// a dot, e.g. favicon.ico), and /styleguide — those must keep working
-// un-prefixed (Story 1.1's /api/health, Story 1.2's /styleguide).
+// a dot, e.g. favicon.ico), /styleguide, and /admin — those must keep
+// working un-prefixed (Story 1.1's /api/health, Story 1.2's /styleguide,
+// Story 1.5's /admin operator shell).
 
 import createMiddleware from "next-intl/middleware";
 import { routing } from "@/i18n/routing";
@@ -17,5 +18,5 @@ import { routing } from "@/i18n/routing";
 export default createMiddleware(routing);
 
 export const config = {
-  matcher: ["/((?!api|_next|_vercel|styleguide|.*\\..*).*)"],
+  matcher: ["/((?!api|_next|_vercel|styleguide|admin|.*\\..*).*)"],
 };

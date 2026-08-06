@@ -1,0 +1,284 @@
+<title>Hướng dẫn chuẩn bị hình ảnh — SamThuongShop</title>
+<style>
+  :root {
+    --bg: #FBF9F4; --surface: #FFFFFF; --sunken: #F1EDE4;
+    --ink: #3B4147; --muted: #6B7178; --caption: #71736B;
+    --sky: #4C6577; --sage: #5E6F4B; --border: #E4DFD3;
+    --amber: #96681F;
+    --shadow: 0 6px 24px -8px rgba(59,65,71,.14);
+    --serif: Georgia, "Times New Roman", serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:#23272b; --surface:#2b3035; --sunken:#262b2f;
+      --ink:#e9e5db; --muted:#a9a99f; --caption:#9a9a90;
+      --sky:#93b1c2; --sage:#a3b98a; --border:#3a4045; --amber:#d2a24a;
+      --shadow: 0 6px 24px -8px rgba(0,0,0,.4);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg:#23272b; --surface:#2b3035; --sunken:#262b2f;
+    --ink:#e9e5db; --muted:#a9a99f; --caption:#9a9a90;
+    --sky:#93b1c2; --sage:#a3b98a; --border:#3a4045; --amber:#d2a24a;
+    --shadow: 0 6px 24px -8px rgba(0,0,0,.4);
+  }
+  :root[data-theme="light"] {
+    --bg:#FBF9F4; --surface:#FFFFFF; --sunken:#F1EDE4;
+    --ink:#3B4147; --muted:#6B7178; --caption:#71736B;
+    --sky:#4C6577; --sage:#5E6F4B; --border:#E4DFD3; --amber:#96681F;
+    --shadow: 0 6px 24px -8px rgba(59,65,71,.14);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: var(--sans); font-size: 17px; line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 56px 24px 96px; }
+
+  .eyebrow {
+    font-size: 12.5px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--sky); font-weight: 600; margin: 0 0 14px;
+  }
+  h1 {
+    font-family: var(--serif); font-weight: 700; font-size: clamp(30px, 6vw, 46px);
+    line-height: 1.1; margin: 0 0 12px; text-wrap: balance; letter-spacing: -.01em;
+  }
+  .lede { font-size: 18px; color: var(--muted); margin: 0 0 8px; max-width: 60ch; }
+  h2 {
+    font-family: var(--serif); font-weight: 700; font-size: 25px; line-height: 1.2;
+    margin: 56px 0 8px; text-wrap: balance;
+  }
+  h3 { font-family: var(--serif); font-weight: 600; font-size: 20px; margin: 0 0 4px; }
+  p { margin: 0 0 14px; }
+  strong { color: var(--ink); font-weight: 600; }
+  a { color: var(--sky); }
+
+  .rule { height: 1px; background: var(--border); border: 0; margin: 40px 0; }
+
+  /* intro callout */
+  .thesis {
+    border-left: 3px solid var(--sage); padding: 4px 0 4px 20px;
+    margin: 28px 0 8px; color: var(--ink); font-size: 18px;
+  }
+  .thesis em { font-style: normal; font-family: var(--serif); font-weight: 600; }
+
+  /* quick table */
+  .tablecard {
+    margin-top: 20px; border: 1px solid var(--border); border-radius: 8px;
+    overflow: hidden; background: var(--surface);
+  }
+  .scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; min-width: 620px; font-size: 15px; }
+  thead th {
+    text-align: left; background: var(--sunken); color: var(--muted);
+    font-size: 12px; letter-spacing: .05em; text-transform: uppercase; font-weight: 600;
+    padding: 12px 14px; border-bottom: 1px solid var(--border);
+  }
+  tbody td { padding: 13px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: 0; }
+  td .sz { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--sky); white-space: nowrap; }
+  td .name { font-weight: 600; }
+  .muted { color: var(--muted); }
+
+  .note {
+    margin-top: 16px; background: var(--sunken); border-radius: 8px;
+    padding: 14px 18px; font-size: 15.5px; color: var(--ink);
+  }
+  .note strong { color: var(--sage); }
+
+  /* asset slot cards */
+  .slot {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 22px 24px; margin: 18px 0; box-shadow: var(--shadow);
+  }
+  .slot-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .num {
+    font-family: var(--serif); font-size: 15px; font-weight: 700; color: var(--surface);
+    background: var(--sky); width: 28px; height: 28px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto;
+    align-self: center;
+  }
+  .badge {
+    margin-left: auto; font-variant-numeric: tabular-nums; font-weight: 600;
+    font-size: 14px; color: var(--sky); background: var(--sunken);
+    border: 1px solid var(--border); border-radius: 999px; padding: 5px 12px; white-space: nowrap;
+  }
+  .slot ul { margin: 10px 0 0; padding-left: 20px; }
+  .slot li { margin: 4px 0; color: var(--muted); }
+  .slot li strong { color: var(--ink); }
+  .whereline { color: var(--muted); font-size: 15.5px; margin: 6px 0 2px; }
+
+  .rules { margin: 8px 0 0; padding: 0; list-style: none; counter-reset: r; }
+  .rules li {
+    position: relative; padding: 10px 0 10px 40px; border-bottom: 1px dashed var(--border);
+  }
+  .rules li:last-child { border-bottom: 0; }
+  .rules li::before {
+    counter-increment: r; content: counter(r);
+    position: absolute; left: 0; top: 10px; font-family: var(--serif); font-weight: 700;
+    color: var(--sage); font-size: 16px;
+  }
+
+  .check { margin: 8px 0 0; padding: 0; list-style: none; }
+  .check li {
+    display: flex; gap: 12px; align-items: flex-start; padding: 11px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .check li:last-child { border-bottom: 0; }
+  .box {
+    flex: 0 0 auto; width: 20px; height: 20px; border: 2px solid var(--sky);
+    border-radius: 5px; margin-top: 2px;
+  }
+
+  .folders {
+    background: var(--sunken); border: 1px solid var(--border); border-radius: 8px;
+    padding: 16px 20px; font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 14px; line-height: 1.9; color: var(--ink); overflow-x: auto;
+  }
+  .folders .c { color: var(--muted); }
+
+  footer { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--border); color: var(--caption); font-size: 14px; }
+
+  :focus-visible { outline: 2px solid var(--sky); outline-offset: 2px; }
+
+  @media print {
+    :root { --bg:#fff; --surface:#fff; --sunken:#f4f1ea; --ink:#222; --muted:#555; --border:#ccc; --shadow:none; }
+    body { font-size: 12pt; }
+    .wrap { padding: 0; max-width: 100%; }
+    .slot, .tablecard { break-inside: avoid; box-shadow: none; }
+    h2 { break-after: avoid; }
+    table { min-width: 0; }
+  }
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">SamThuongShop · Chuẩn bị hình ảnh</p>
+  <h1>Hướng dẫn chuẩn bị hình ảnh</h1>
+  <p class="lede">Danh sách ảnh cần gửi, kích thước, và nơi mỗi ảnh xuất hiện — để trang web của anh trông thật sắc nét.</p>
+
+  <blockquote class="thesis">
+    Cả trang web được xây trên một nguyên tắc: <em>bức ảnh là thứ nổi bật nhất trên trang.</em>
+    Vì vậy hình ảnh quan trọng hơn mọi thứ khác. Hướng dẫn này cho biết chính xác cần chuẩn bị gì.
+  </blockquote>
+
+  <h2>Bảng tóm tắt — những ảnh cần gửi</h2>
+  <div class="tablecard"><div class="scroll">
+    <table>
+      <thead>
+        <tr><th>#</th><th>Loại ảnh</th><th>Hiển thị ở đâu</th><th>Kích thước gửi</th><th>Định dạng</th><th>Số lượng</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td><td class="name">Ảnh bìa (Hero)</td><td class="muted">Ảnh lớn ở đầu trang chủ</td>
+          <td><span class="sz">2560 × 1440</span><br><span class="muted">tối thiểu rộng 2400 · ngang</span></td>
+          <td>JPEG</td><td>1 <span class="muted">(tối đa 3)</span></td>
+        </tr>
+        <tr>
+          <td>2</td><td class="name">Ảnh chân dung</td><td class="muted">Trang “Giới thiệu”</td>
+          <td><span class="sz">1200 × 1500</span><br><span class="muted">dọc</span></td>
+          <td>JPEG</td><td>1</td>
+        </tr>
+        <tr>
+          <td>3</td><td class="name">Ảnh chim</td><td class="muted">Bộ sưu tập · cửa hàng · trang sản phẩm</td>
+          <td><span class="sz">cạnh dài 2000–2400</span><br><span class="muted">giữ nguyên tỷ lệ gốc</span></td>
+          <td>JPEG</td><td>một bộ chọn lọc</td>
+        </tr>
+        <tr>
+          <td>4</td><td class="name">Favicon</td><td class="muted">Biểu tượng nhỏ trên tab trình duyệt</td>
+          <td class="muted">Chúng tôi sẽ làm</td><td>—</td><td>0</td>
+        </tr>
+        <tr>
+          <td>5</td><td class="name">Ảnh chia sẻ</td><td class="muted">Xem trước khi chia sẻ link (Facebook/Zalo)</td>
+          <td class="muted">Chúng tôi sẽ làm</td><td>—</td><td>0</td>
+        </tr>
+      </tbody>
+    </table>
+  </div></div>
+
+  <div class="note"><strong>Không cần gửi logo.</strong> Tên shop “Sâm Thương” được thể hiện bằng kiểu chữ đẹp, không phải bằng hình ảnh.</div>
+
+  <hr class="rule">
+
+  <h2>Chi tiết từng loại ảnh</h2>
+
+  <div class="slot">
+    <div class="slot-head"><span class="num">1</span><h3>Ảnh bìa (Hero)</h3><span class="badge">2560 × 1440 px · ngang</span></div>
+    <p class="whereline"><strong>Ở đâu:</strong> ảnh lớn trải ngang đầu trang chủ. Trên điện thoại nó phủ kín chiều rộng màn hình.</p>
+    <ul>
+      <li>Đây là thứ <strong>đầu tiên</strong> khách nhìn thấy — nên chọn bức ảnh chim <strong>ấn tượng nhất</strong>.</li>
+      <li>Ảnh <strong>ngang</strong> (rộng, không dọc). Tỷ lệ 16:9 hoặc 3:2 đều được.</li>
+      <li>JPEG, tối đa ~1,5 MB.</li>
+      <li class="muted">Ảnh <code>banner.jpg</code> hiện tại là 1107 × 738 — dùng được nhưng sẽ hơi mờ trên màn hình lớn. Nếu còn ảnh gốc, hãy xuất lại ở chiều rộng ≥ 2400 px.</li>
+    </ul>
+  </div>
+
+  <div class="slot">
+    <div class="slot-head"><span class="num">2</span><h3>Ảnh chân dung Sâm Thương</h3><span class="badge">1200 × 1500 px · dọc</span></div>
+    <p class="whereline"><strong>Ở đâu:</strong> trang “Giới thiệu”, bên cạnh phần tiểu sử.</p>
+    <ul>
+      <li>Khách tin tưởng một con người thật — ảnh đẹp cho thấy đây là một nhà nhiếp ảnh chim <strong>chuyên nghiệp</strong>.</li>
+      <li>Lý tưởng nhất là ảnh <strong>ngoài thực địa</strong> — cùng ống nhòm hoặc máy ảnh, ánh sáng tự nhiên, phông nền gọn gàng.</li>
+      <li>Chụp từ vai trở lên hoặc từ hông trở lên, chừa một chút khoảng trống phía trên đầu.</li>
+      <li>JPEG, tối đa ~800 KB.</li>
+    </ul>
+  </div>
+
+  <div class="slot">
+    <div class="slot-head"><span class="num">3</span><h3>Ảnh chim — phần quan trọng nhất</h3><span class="badge">cạnh dài 2000–2400 px</span></div>
+    <p class="whereline"><strong>Ở đâu:</strong> bộ sưu tập (dạng lưới xen kẽ như tạp chí), cửa hàng, và mỗi trang sản phẩm.</p>
+    <ul>
+      <li><strong>Giữ nguyên tỷ lệ gốc của mỗi ảnh</strong> — đừng cắt tất cả về cùng một kích thước. Lưới được thiết kế để xen kẽ ảnh dọc và ảnh ngang thật đẹp.</li>
+      <li>JPEG (chất lượng ~85), tối đa ~1 MB mỗi ảnh.</li>
+      <li><strong>Số lượng:</strong> một bộ <strong>chọn lọc kỹ</strong> hơn là gửi thật nhiều. Khởi đầu tốt là khoảng <strong>12–24 ảnh</strong>, chia theo vài chủ đề (ví dụ: <em>Đất ngập nước</em>, <em>Chim rừng</em>, <em>Bói cá</em>, <em>Chim săn mồi</em>). Có thể bổ sung sau.</li>
+    </ul>
+    <div class="note" style="margin-top:14px">
+      <strong style="color:var(--amber)">Quan trọng —</strong> với mỗi ảnh, hãy cho biết: <strong>tên loài (tiếng Việt &amp; tiếng Anh)</strong>, <strong>địa điểm</strong> và <strong>thời gian chụp</strong>. Trang web sẽ in chú thích dưới mỗi ảnh, ví dụ <em>“Bói cá lam · Tràm Chim”.</em> Hãy điền vào file <strong>photo-metadata-template.csv</strong> — mỗi ảnh một dòng.
+    </div>
+  </div>
+
+  <div class="slot">
+    <div class="slot-head"><span class="num">4</span><h3>Favicon &amp; ảnh chia sẻ — chúng tôi lo</h3><span class="badge">không cần gửi</span></div>
+    <p class="whereline">Biểu tượng nhỏ trên tab trình duyệt và ảnh xem trước khi chia sẻ link (Facebook/Zalo) — <strong>chúng tôi sẽ tạo giúp anh</strong> từ một ảnh chim và tên shop. Nếu anh Sâm Thương có ý muốn riêng thì cứ báo.</p>
+  </div>
+
+  <hr class="rule">
+
+  <h2>Quy tắc vàng cho mọi ảnh</h2>
+  <ul class="rules">
+    <li><strong>Xuất ở hệ màu sRGB</strong> (không phải Adobe RGB / ProPhoto). Đây là một tùy chọn khi “Export” trong Lightroom/Photoshop. Sai hệ màu → màu bị nhợt nhạt trên trình duyệt.</li>
+    <li><strong>Định dạng JPEG</strong> cho ảnh chụp (chất lượng ~85). Trang web tự tạo các bản tối ưu hiện đại — anh không cần làm.</li>
+    <li><strong>⭐ Giữ lại ảnh gốc độ phân giải cao!</strong> Các ảnh trên web đã được thu nhỏ cho nhẹ. Nhưng khi bắt đầu <strong>bán ảnh in</strong>, chúng ta cần file gốc <strong>độ phân giải cao (300 DPI)</strong> — <strong>đừng bao giờ xóa ảnh gốc.</strong></li>
+    <li><strong>Tên file</strong> đơn giản là được — ví dụ <code>boica-tramchim-01.jpg</code>. Thông tin chi tiết ghi trong file CSV.</li>
+  </ul>
+
+  <hr class="rule">
+
+  <h2>Nơi bỏ file vào</h2>
+  <div class="folders">
+image_assets/<br>
+├── hero/ <span class="c">← ảnh bìa trang chủ (mục 1)</span><br>
+├── about/ <span class="c">← ảnh chân dung Sâm Thương (mục 2)</span><br>
+├── portfolio/ <span class="c">← các ảnh chim (mục 3)</span><br>
+├── favicon-og/ <span class="c">← chúng tôi lo, để trống</span><br>
+└── photo-metadata-template.csv <span class="c">← điền mỗi ảnh một dòng</span>
+  </div>
+
+  <hr class="rule">
+
+  <h2>Danh sách kiểm tra của anh Sâm Thương</h2>
+  <ul class="check">
+    <li><span class="box"></span><span><strong>1 ảnh bìa</strong> — ảnh chim đẹp nhất, nằm ngang, ~2560 × 1440</span></li>
+    <li><span class="box"></span><span><strong>1 ảnh chân dung</strong> của mình — nằm dọc, ~1200 × 1500</span></li>
+    <li><span class="box"></span><span><strong>~12–24 ảnh chim</strong> — cạnh dài 2000–2400, giữ tỷ lệ gốc, chia theo vài chủ đề</span></li>
+    <li><span class="box"></span><span><strong>Điền file CSV</strong> — tên loài (Việt + Anh), địa điểm, thời gian cho mỗi ảnh</span></li>
+    <li><span class="box"></span><span>Tất cả xuất ở định dạng <strong>sRGB JPEG</strong></span></li>
+    <li><span class="box"></span><span><strong>Giữ an toàn ảnh gốc độ phân giải cao</strong> (để sau này bán ảnh in)</span></li>
+  </ul>
+
+  <footer>
+    SamThuongShop — hướng dẫn chuẩn bị hình ảnh. Có thắc mắc, hãy hỏi Thịnh An.
+  </footer>
+</div>
