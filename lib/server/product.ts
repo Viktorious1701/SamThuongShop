@@ -26,6 +26,8 @@ export type ProductVariantDTO = {
   originalFilename: string | null;
   contentType: string | null;
   sizeBytes: number | null;
+  previewKey: string | null;
+  previewUrl: string | null;
 };
 
 export type ProductDTO = {
@@ -90,6 +92,7 @@ function toVariantRows(variants: ProductInput["variants"]) {
     originalFilename: v.format === "DIGITAL" ? v.originalFilename ?? null : null,
     contentType: v.format === "DIGITAL" ? v.contentType ?? null : null,
     sizeBytes: v.format === "DIGITAL" ? v.sizeBytes ?? null : null,
+    previewKey: v.format === "DIGITAL" ? v.previewKey ?? null : null,
   }));
 }
 
@@ -156,6 +159,8 @@ export async function getProduct(id: string): Promise<ProductDTO | null> {
       originalFilename: v.originalFilename,
       contentType: v.contentType,
       sizeBytes: v.sizeBytes,
+      previewKey: v.previewKey,
+      previewUrl: v.previewKey ? publicUrl(v.previewKey) : null,
     })),
   };
 }
@@ -207,9 +212,18 @@ export async function updateProduct(
       v.format === "DIGITAL" && v.originalKey ? [v.originalKey] : [],
     ),
   );
-  const orphanPublicKeys = existing.images
-    .map((i) => i.key)
-    .filter((k) => !incomingImageKeys.has(k));
+  const incomingPreviewKeys = new Set(
+    input.variants.flatMap((v) =>
+      v.format === "DIGITAL" && v.previewKey ? [v.previewKey] : [],
+    ),
+  );
+  // Public bucket holds both display images and watermarked previews.
+  const orphanPublicKeys = [
+    ...existing.images.map((i) => i.key).filter((k) => !incomingImageKeys.has(k)),
+    ...existing.variants
+      .flatMap((v) => (v.previewKey ? [v.previewKey] : []))
+      .filter((k) => !incomingPreviewKeys.has(k)),
+  ];
   const orphanPrivateKeys = existing.variants
     .flatMap((v) => (v.originalKey ? [v.originalKey] : []))
     .filter((k) => !incomingOriginalKeys.has(k));
@@ -256,7 +270,10 @@ export async function deleteProduct(id: string): Promise<void> {
   // R2 objects the child rows referenced.
   await prisma.product.delete({ where: { id } });
   await cleanupObjects(
-    product.images.map((i) => i.key),
+    [
+      ...product.images.map((i) => i.key),
+      ...product.variants.flatMap((v) => (v.previewKey ? [v.previewKey] : [])),
+    ],
     product.variants.flatMap((v) => (v.originalKey ? [v.originalKey] : [])),
   );
 }

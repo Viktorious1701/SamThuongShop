@@ -14,7 +14,7 @@ import { useRouter } from "next/navigation";
 import { TextField } from "@/components/form/text-field";
 import { TextareaField } from "@/components/form/textarea-field";
 import { SelectField } from "@/components/form/select-field";
-import { createUploadUrl, saveProduct } from "./actions";
+import { createUploadUrl, generatePreviewAction, saveProduct } from "./actions";
 import type { ProductDTO } from "@/lib/server/product";
 
 type ImageState = { key: string; url: string; alt: string };
@@ -26,6 +26,8 @@ type VariantState = {
   originalFilename: string | null;
   contentType: string | null;
   sizeBytes: number | null;
+  previewKey: string | null;
+  previewUrl: string | null;
 };
 
 const FORMAT_OPTIONS = [
@@ -42,6 +44,8 @@ function emptyVariant(): VariantState {
     originalFilename: null,
     contentType: null,
     sizeBytes: null,
+    previewKey: null,
+    previewUrl: null,
   };
 }
 
@@ -101,6 +105,8 @@ export function ProductEditor({
       originalFilename: v.originalFilename,
       contentType: v.contentType,
       sizeBytes: v.sizeBytes,
+      previewKey: v.previewKey,
+      previewUrl: v.previewUrl,
     })) ?? [emptyVariant()],
   );
 
@@ -137,12 +143,25 @@ export function ProductEditor({
     setBusy(true);
     try {
       const { key } = await uploadToR2(file, "private");
+      // Clear any prior preview until the new one is generated.
       patchVariant(index, {
         originalKey: key,
         originalFilename: file.name,
         contentType: file.type || null,
         sizeBytes: file.size,
+        previewKey: null,
+        previewUrl: null,
       });
+      // Story 2.2 — generate the watermarked public preview from the original.
+      const preview = await generatePreviewAction(key);
+      if (preview.ok) {
+        patchVariant(index, {
+          previewKey: preview.previewKey,
+          previewUrl: preview.previewUrl,
+        });
+      } else {
+        setError(preview.error);
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Original upload failed.");
     } finally {
@@ -174,6 +193,7 @@ export function ProductEditor({
               originalFilename: v.originalFilename,
               contentType: v.contentType,
               sizeBytes: v.sizeBytes,
+              previewKey: v.previewKey,
             }
           : {}),
       })),
@@ -356,6 +376,23 @@ export function ProductEditor({
                       ? `Uploaded: ${v.originalFilename}`
                       : "No file uploaded yet."}
                   </p>
+                  {v.previewUrl ? (
+                    <div className="space-y-1 pt-1">
+                      <span className="text-caption text-ink-muted">
+                        Watermarked preview (shown to shoppers):
+                      </span>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={v.previewUrl}
+                        alt="Watermarked preview"
+                        className="h-40 w-auto rounded border border-border object-contain"
+                      />
+                    </div>
+                  ) : v.originalKey ? (
+                    <p className="text-caption text-ink-muted">
+                      Generating watermarked preview…
+                    </p>
+                  ) : null}
                 </div>
               ) : null}
 

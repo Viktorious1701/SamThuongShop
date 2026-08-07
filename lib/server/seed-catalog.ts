@@ -14,6 +14,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { prisma } from "@/lib/server/db";
 import { putObject } from "@/lib/server/storage";
+import { generateWatermarkedPreview } from "@/lib/server/watermark";
 
 type DemoProduct = {
   slug: string;
@@ -108,6 +109,9 @@ export async function seedDemoCatalog(): Promise<void> {
       contentType: "image/jpeg",
     });
 
+    // Story 2.2 — watermarked public preview for the digital variant.
+    const previewKey = await generateWatermarkedPreview(originalKey);
+
     await prisma.product.create({
       data: {
         slug: d.slug,
@@ -134,6 +138,7 @@ export async function seedDemoCatalog(): Promise<void> {
               originalFilename: `${d.slug}.jpg`,
               contentType: "image/jpeg",
               sizeBytes: buf.length,
+              previewKey,
             },
           ],
         },

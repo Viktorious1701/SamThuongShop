@@ -15,6 +15,7 @@ import {
   publicUrl,
   type StorageScope,
 } from "@/lib/server/storage";
+import { generateWatermarkedPreview } from "@/lib/server/watermark";
 import {
   createProduct,
   deleteProduct,
@@ -72,6 +73,30 @@ export async function createUploadUrl(input: {
     url,
     publicUrl: input.scope === "public" ? publicUrl(key) : null,
   };
+}
+
+export type GeneratePreviewResult =
+  | { ok: true; previewKey: string; previewUrl: string }
+  | { ok: false; error: string };
+
+/**
+ * Story 2.2 — generates a watermarked public preview from a just-uploaded
+ * private original. Called by the editor right after a DIGITAL original
+ * finishes uploading; the returned key is saved on the variant.
+ */
+export async function generatePreviewAction(
+  originalKey: string,
+): Promise<GeneratePreviewResult> {
+  await requireOperator();
+  if (!originalKey) {
+    return { ok: false, error: "Upload the original file first." };
+  }
+  try {
+    const previewKey = await generateWatermarkedPreview(originalKey);
+    return { ok: true, previewKey, previewUrl: publicUrl(previewKey) };
+  } catch {
+    return { ok: false, error: "Could not generate the preview. Try again." };
+  }
 }
 
 /** Create (id === null) or update a product from the editor payload. */

@@ -40,6 +40,8 @@ const variantSchema = z.discriminatedUnion("format", [
     originalFilename: z.string().trim().max(300).optional().nullable(),
     contentType: z.string().trim().max(150).optional().nullable(),
     sizeBytes: z.number().int().positive().optional().nullable(),
+    // Story 2.2 — watermarked public preview key (generated on upload).
+    previewKey: z.string().optional().nullable(),
   }),
 ]);
 

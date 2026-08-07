@@ -18,6 +18,7 @@
 import { randomUUID } from "node:crypto";
 import {
   DeleteObjectCommand,
+  GetObjectCommand,
   PutObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3";
@@ -95,6 +96,23 @@ export async function presignUpload(input: {
 export function publicUrl(key: string): string {
   const base = env("R2_PUBLIC_BASE_URL").replace(/\/+$/, "");
   return `${base}/${key}`;
+}
+
+/** Downloads an object into a Buffer (server-side). Used to read a private
+ * original for watermarked-preview generation (Story 2.2). Not subject to any
+ * client-upload body cap — this is server → R2. */
+export async function getObject(input: {
+  scope: StorageScope;
+  key: string;
+}): Promise<Buffer> {
+  const res = await client().send(
+    new GetObjectCommand({
+      Bucket: bucketFor(input.scope),
+      Key: input.key,
+    }),
+  );
+  const bytes = await res.Body!.transformToByteArray();
+  return Buffer.from(bytes);
 }
 
 /** Server-side upload — used by the seed (small placeholder files only). */
