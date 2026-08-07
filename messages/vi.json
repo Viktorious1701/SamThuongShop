@@ -53,5 +53,29 @@
     "emailTaken": "Email này đã được sử dụng.",
     "invalidCredentials": "Email hoặc mật khẩu không đúng.",
     "genericError": "Đã xảy ra lỗi. Vui lòng thử lại."
+  },
+  "Shop": {
+    "title": "Cửa hàng",
+    "empty": "Chưa có tác phẩm nào. Vui lòng quay lại sau.",
+    "fromPrice": "từ",
+    "tagPrint": "Bản in",
+    "tagDigital": "Bản số",
+    "tagBoth": "Bản in · Bản số"
+  },
+  "Product": {
+    "printSizes": "Kích thước bản in",
+    "digitalTiers": "Bản số",
+    "price": "Giá",
+    "madeToOrder": "Đặt in theo yêu cầu — in và giao riêng cho bạn.",
+    "digitalNote": "Bản số — giao sau khi thanh toán. Số lượng cố định là 1.",
+    "license": "Chỉ dùng cho mục đích cá nhân, phi thương mại.",
+    "watermarkBadge": "Ảnh xem trước có đóng dấu",
+    "addToCart": "Thêm vào giỏ",
+    "addToCartSoon": "Giỏ hàng sẽ có ở bản cập nhật tới",
+    "descriptionHeading": "Về tác phẩm",
+    "unavailableTitle": "Tác phẩm này hiện không có sẵn",
+    "unavailableBody": "Có thể tác phẩm đã ẩn hoặc liên kết đã cũ.",
+    "backToShop": "Về Cửa hàng",
+    "viewPortfolio": "Xem Portfolio"
   }
 }

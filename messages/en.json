@@ -53,5 +53,29 @@
     "emailTaken": "An account with this email already exists.",
     "invalidCredentials": "Incorrect email or password.",
     "genericError": "Something went wrong. Please try again."
+  },
+  "Shop": {
+    "title": "Shop",
+    "empty": "No pieces are available yet. Please check back soon.",
+    "fromPrice": "from",
+    "tagPrint": "Print",
+    "tagDigital": "Digital",
+    "tagBoth": "Print · Digital"
+  },
+  "Product": {
+    "printSizes": "Print sizes",
+    "digitalTiers": "Digital tiers",
+    "price": "Price",
+    "madeToOrder": "Made to order — printed and shipped just for you.",
+    "digitalNote": "Digital download — delivered after payment. Quantity is fixed at 1.",
+    "license": "Personal, non-commercial use only.",
+    "watermarkBadge": "Watermarked preview",
+    "addToCart": "Add to cart",
+    "addToCartSoon": "Cart arrives in the next update",
+    "descriptionHeading": "About this piece",
+    "unavailableTitle": "This piece isn't available right now",
+    "unavailableBody": "It may have been unpublished or the link is out of date.",
+    "backToShop": "Back to Shop",
+    "viewPortfolio": "View Portfolio"
   }
 }

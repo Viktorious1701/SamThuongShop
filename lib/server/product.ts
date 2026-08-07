@@ -56,6 +56,46 @@ export type SaveProductResult =
   | { ok: true; id: string }
   | { ok: false; error: string };
 
+// --- Storefront (client-safe) DTOs ---------------------------------------
+// These NEVER carry private original fields (originalKey/filename/contentType)
+// — the sellable file must not leak before purchase (AD-6/AD-15). Only the
+// public preview URL is exposed for digital variants.
+
+export type ProductFormats = "PRINT" | "DIGITAL" | "BOTH";
+
+export type StorefrontCard = {
+  slug: string;
+  nameVi: string;
+  nameEn: string;
+  imageUrl: string | null;
+  fromPriceVnd: number;
+  formats: ProductFormats;
+};
+
+export type StorefrontVariant = {
+  format: "PRINT" | "DIGITAL";
+  label: string;
+  priceVnd: number;
+  previewUrl: string | null;
+};
+
+export type StorefrontProduct = {
+  slug: string;
+  nameVi: string;
+  nameEn: string;
+  descriptionVi: string | null;
+  descriptionEn: string | null;
+  images: { url: string; alt: string | null }[];
+  variants: StorefrontVariant[];
+};
+
+function deriveFormats(formats: ("PRINT" | "DIGITAL")[]): ProductFormats {
+  const hasPrint = formats.includes("PRINT");
+  const hasDigital = formats.includes("DIGITAL");
+  if (hasPrint && hasDigital) return "BOTH";
+  return hasDigital ? "DIGITAL" : "PRINT";
+}
+
 // --- helpers --------------------------------------------------------------
 
 /** URL-safe slug from the English name; a short random suffix guarantees
@@ -161,6 +201,63 @@ export async function getProduct(id: string): Promise<ProductDTO | null> {
       sizeBytes: v.sizeBytes,
       previewKey: v.previewKey,
       previewUrl: v.previewKey ? publicUrl(v.previewKey) : null,
+    })),
+  };
+}
+
+// --- storefront reads (published-only, client-safe) -----------------------
+
+export async function listPublishedProducts(): Promise<StorefrontCard[]> {
+  const rows = await prisma.product.findMany({
+    where: { published: true },
+    orderBy: { createdAt: "desc" },
+    include: {
+      images: { orderBy: { position: "asc" }, take: 1 },
+      variants: { select: { format: true, priceVnd: true } },
+    },
+  });
+
+  return rows
+    .filter((p) => p.variants.length > 0)
+    .map((p) => ({
+      slug: p.slug,
+      nameVi: p.nameVi,
+      nameEn: p.nameEn,
+      imageUrl: p.images[0] ? publicUrl(p.images[0].key) : null,
+      fromPriceVnd: Math.min(...p.variants.map((v) => v.priceVnd)),
+      formats: deriveFormats(p.variants.map((v) => v.format)),
+    }));
+}
+
+export async function getPublishedProductBySlug(
+  slug: string,
+): Promise<StorefrontProduct | null> {
+  const p = await prisma.product.findUnique({
+    where: { slug },
+    include: {
+      images: { orderBy: { position: "asc" } },
+      variants: { orderBy: { position: "asc" } },
+    },
+  });
+  if (!p || !p.published) return null;
+
+  // Map to the client-safe shape ONLY — no originalKey/filename/contentType.
+  return {
+    slug: p.slug,
+    nameVi: p.nameVi,
+    nameEn: p.nameEn,
+    descriptionVi: p.descriptionVi,
+    descriptionEn: p.descriptionEn,
+    images: p.images.map((img) => ({
+      url: publicUrl(img.key),
+      alt: img.alt,
+    })),
+    variants: p.variants.map((v) => ({
+      format: v.format,
+      label: v.label,
+      priceVnd: v.priceVnd,
+      previewUrl:
+        v.format === "DIGITAL" && v.previewKey ? publicUrl(v.previewKey) : null,
     })),
   };
 }
