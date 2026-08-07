@@ -24,3 +24,76 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
+
+// --- Epic 2, Story 2.1 — Product catalog ---------------------------------
+// First relational tables. Bilingual content is stored per-locale (vi/en)
+// on the row itself (AD-7 — content is data, not next-intl message keys);
+// prices are integer VND (AD-5). Only lib/server touches these (AD-2).
+
+// A Variant is EITHER a Physical Print (size) OR a Digital Download (tier)
+// — this discriminator drives fulfilment downstream (AD-8: shipping iff any
+// physical line; COD iff no digital line; digital line qty fixed to 1).
+enum VariantFormat {
+  PRINT
+  DIGITAL
+}
+
+// A Product is one of Sam Thuong's bird images, sold via one or more
+// Variants. Publish/unpublish controls storefront visibility (FR-19);
+// unpublished rows are preserved in admin.
+model Product {
+  id            String   @id @default(cuid())
+  slug          String   @unique // stable storefront URL key (Epic 2.4)
+  nameVi        String
+  nameEn        String
+  descriptionVi String?
+  descriptionEn String?
+  published     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  variants ProductVariant[]
+  images   ProductImage[]
+}
+
+// A specific purchasable form of a Product with its own integer-VND price.
+// `label` is operator-defined free text (the print size or digital tier) —
+// OQ-3 (concrete options) stays open, so the model takes arbitrary labels
+// rather than a fixed enum. Digital-only columns hold the private original;
+// `previewKey` is populated later by Story 2.2 (watermarked preview).
+model ProductVariant {
+  id        String        @id @default(cuid())
+  productId String
+  product   Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  format    VariantFormat
+  label     String
+  priceVnd  Int
+  position  Int           @default(0)
+
+  // Digital Download only — the sellable original in PRIVATE R2 (AD-15,
+  // non-derivable key). Never served before payment (AD-6, Epic 3).
+  originalKey      String?
+  originalFilename String?
+  contentType      String?
+  sizeBytes        Int?
+  previewKey       String? // Story 2.2 — watermarked preview (public)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId])
+}
+
+// A public display image for a Product. `key` addresses an object in the
+// PUBLIC R2 bucket; the public URL is built by lib/server/storage.ts.
+model ProductImage {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  key       String
+  alt       String?
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([productId])
+}

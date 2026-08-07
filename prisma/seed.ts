@@ -14,6 +14,7 @@
 
 import "dotenv/config";
 import { upsertUserWithRole } from "@/lib/server/user";
+import { isR2Configured, seedDemoCatalog } from "@/lib/server/seed-catalog";
 
 const DEV_OPERATOR_EMAIL = "admin@samthuong.shop";
 const DEV_OPERATOR_PASSWORD = "Operator123!";
@@ -30,6 +31,14 @@ async function main() {
   });
 
   console.log(`Seeded operator user: ${operator.email} (role=${operator.role})`);
+
+  // Story 2.1 — demo catalog. Needs R2 to store images/originals; skip
+  // gracefully when it isn't configured yet so the operator seed still runs.
+  if (isR2Configured()) {
+    await seedDemoCatalog();
+  } else {
+    console.log("R2 not configured — skipping demo catalog seed.");
+  }
 }
 
 main()
