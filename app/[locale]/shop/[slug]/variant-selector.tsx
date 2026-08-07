@@ -8,8 +8,10 @@
 // preview). Add-to-cart is a disabled placeholder — the cart is Epic 3.
 // Localized label strings are passed in as props (page resolves them).
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { formatVnd } from "@/lib/format";
+import { Link, useRouter } from "@/i18n/navigation";
+import { addToCartAction } from "../../cart/actions";
 import type { StorefrontVariant } from "@/lib/server/product";
 
 type Labels = {
@@ -21,7 +23,8 @@ type Labels = {
   license: string;
   watermarkBadge: string;
   addToCart: string;
-  addToCartSoon: string;
+  added: string;
+  viewCart: string;
 };
 
 export function VariantSelector({
@@ -32,7 +35,18 @@ export function VariantSelector({
   labels: Labels;
 }) {
   const [selected, setSelected] = useState(0);
+  const [added, setAdded] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
   const current = variants[selected];
+
+  function onAdd() {
+    startTransition(async () => {
+      await addToCartAction(current.id);
+      setAdded(true);
+      router.refresh(); // update the nav cart badge
+    });
+  }
 
   const prints = variants
     .map((v, i) => ({ v, i }))
@@ -48,7 +62,10 @@ export function VariantSelector({
         key={index}
         type="button"
         aria-pressed={active}
-        onClick={() => setSelected(index)}
+        onClick={() => {
+          setSelected(index);
+          setAdded(false);
+        }}
         className={`rounded-md border px-4 py-2 text-caption transition-colors ${
           active
             ? "border-sky-deep text-sky-deep"
@@ -110,13 +127,20 @@ export function VariantSelector({
       <div>
         <button
           type="button"
-          disabled
-          title={labels.addToCartSoon}
-          className="w-full max-w-xs cursor-not-allowed rounded-full bg-surface-sunken px-5 py-3 text-caption text-ink-muted"
+          onClick={onAdd}
+          disabled={isPending}
+          className="w-full max-w-xs rounded-full bg-sky-deep px-5 py-3 text-caption text-white transition-colors hover:bg-[#3D5464] focus:outline-none focus:ring-2 focus:ring-ink focus:ring-offset-2 disabled:opacity-60"
         >
           {labels.addToCart}
         </button>
-        <p className="mt-2 text-caption text-ink-muted">{labels.addToCartSoon}</p>
+        {added ? (
+          <p className="mt-2 text-caption text-sage-deep">
+            {labels.added} ·{" "}
+            <Link href="/cart" className="underline">
+              {labels.viewCart}
+            </Link>
+          </p>
+        ) : null}
       </div>
     </div>
   );

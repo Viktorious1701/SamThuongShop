@@ -77,5 +77,20 @@
     "unavailableBody": "It may have been unpublished or the link is out of date.",
     "backToShop": "Back to Shop",
     "viewPortfolio": "View Portfolio"
+  },
+  "Cart": {
+    "title": "Your cart",
+    "empty": "Your cart is empty.",
+    "continueShopping": "Browse the shop",
+    "subtotal": "Subtotal",
+    "remove": "Remove",
+    "digitalFixed": "Digital — quantity fixed to 1",
+    "decrease": "Decrease quantity",
+    "increase": "Increase quantity",
+    "shippingNote": "Shipping is calculated at checkout (prints only).",
+    "checkout": "Checkout",
+    "checkoutSoon": "Checkout arrives in the next update.",
+    "added": "Added to cart",
+    "viewCart": "View cart"
   }
 }

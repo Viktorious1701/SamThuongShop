@@ -77,5 +77,20 @@
     "unavailableBody": "Có thể tác phẩm đã ẩn hoặc liên kết đã cũ.",
     "backToShop": "Về Cửa hàng",
     "viewPortfolio": "Xem Portfolio"
+  },
+  "Cart": {
+    "title": "Giỏ hàng của bạn",
+    "empty": "Giỏ hàng của bạn đang trống.",
+    "continueShopping": "Xem cửa hàng",
+    "subtotal": "Tạm tính",
+    "remove": "Xóa",
+    "digitalFixed": "Bản số — số lượng cố định là 1",
+    "decrease": "Giảm số lượng",
+    "increase": "Tăng số lượng",
+    "shippingNote": "Phí vận chuyển được tính khi thanh toán (chỉ bản in).",
+    "checkout": "Thanh toán",
+    "checkoutSoon": "Thanh toán sẽ có ở bản cập nhật tới.",
+    "added": "Đã thêm vào giỏ",
+    "viewCart": "Xem giỏ hàng"
   }
 }

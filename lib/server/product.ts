@@ -73,10 +73,24 @@ export type StorefrontCard = {
 };
 
 export type StorefrontVariant = {
+  id: string;
   format: "PRINT" | "DIGITAL";
   label: string;
   priceVnd: number;
   previewUrl: string | null;
+};
+
+// A single variant resolved for the cart — server-authoritative price/format
+// + the data needed to render a cart line (public image only).
+export type CartVariant = {
+  id: string;
+  productSlug: string;
+  nameVi: string;
+  nameEn: string;
+  format: "PRINT" | "DIGITAL";
+  label: string;
+  priceVnd: number;
+  imageUrl: string | null;
 };
 
 export type StorefrontProduct = {
@@ -253,6 +267,7 @@ export async function getPublishedProductBySlug(
       alt: img.alt,
     })),
     variants: p.variants.map((v) => ({
+      id: v.id,
       format: v.format,
       label: v.label,
       priceVnd: v.priceVnd,
@@ -260,6 +275,39 @@ export async function getPublishedProductBySlug(
         v.format === "DIGITAL" && v.previewKey ? publicUrl(v.previewKey) : null,
     })),
   };
+}
+
+/**
+ * Server-authoritative variant read for the cart: returns only variants of
+ * PUBLISHED products (unpublished/missing ids are dropped) with the data a
+ * cart line needs — price/format come from the DB, never the client (AD-10).
+ */
+export async function getVariantsByIds(ids: string[]): Promise<CartVariant[]> {
+  if (ids.length === 0) return [];
+  const rows = await prisma.productVariant.findMany({
+    where: { id: { in: ids }, product: { published: true } },
+    include: {
+      product: {
+        select: {
+          slug: true,
+          nameVi: true,
+          nameEn: true,
+          images: { orderBy: { position: "asc" }, take: 1 },
+        },
+      },
+    },
+  });
+
+  return rows.map((v) => ({
+    id: v.id,
+    productSlug: v.product.slug,
+    nameVi: v.product.nameVi,
+    nameEn: v.product.nameEn,
+    format: v.format,
+    label: v.label,
+    priceVnd: v.priceVnd,
+    imageUrl: v.product.images[0] ? publicUrl(v.product.images[0].key) : null,
+  }));
 }
 
 // --- writes ---------------------------------------------------------------

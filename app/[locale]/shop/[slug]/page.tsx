@@ -20,8 +20,9 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
 export default async function ProductDetailPage({ params }: Params) {
   const { slug } = await params;
-  const [t, locale, product] = await Promise.all([
+  const [t, tCart, locale, product] = await Promise.all([
     getTranslations("Product"),
+    getTranslations("Cart"),
     getLocale(),
     getPublishedProductBySlug(slug),
   ]);
@@ -108,7 +109,8 @@ export default async function ProductDetailPage({ params }: Params) {
               license: t("license"),
               watermarkBadge: t("watermarkBadge"),
               addToCart: t("addToCart"),
-              addToCartSoon: t("addToCartSoon"),
+              added: tCart("added"),
+              viewCart: tCart("viewCart"),
             }}
           />
         </div>

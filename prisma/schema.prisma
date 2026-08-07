@@ -52,8 +52,9 @@ model Product {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  variants ProductVariant[]
-  images   ProductImage[]
+  variants    ProductVariant[]
+  images      ProductImage[]
+  collections Collection[] // Story 2.3 — many-to-many
 }
 
 // A specific purchasable form of a Product with its own integer-VND price.
@@ -96,4 +97,31 @@ model ProductImage {
   createdAt DateTime @default(now())
 
   @@index([productId])
+}
+
+// --- Story 2.3 — Collections + store settings ----------------------------
+
+// A curated grouping of Products (by species, habitat, theme). Many-to-many
+// with Product — a photo can appear in several collections. Storefront
+// filtering by Collection lands in Story 2.4.
+model Collection {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  nameVi        String
+  nameEn        String
+  descriptionVi String?
+  descriptionEn String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  products Product[] // implicit m-n join (_CollectionToProduct)
+}
+
+// Singleton store settings (one row, fixed id "store"). Holds the flat
+// shipping fee (integer VND, AD-5) the checkout applies to Physical Print
+// Orders (FR-20 / FR-7). v1 is a single flat fee; tiered rating deferred.
+model StoreSetting {
+  id             String   @id @default("store")
+  shippingFeeVnd Int      @default(0)
+  updatedAt      DateTime @updatedAt
 }

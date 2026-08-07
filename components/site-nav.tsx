@@ -13,11 +13,13 @@ import { auth } from "@/auth";
 import { Link } from "@/i18n/navigation";
 import { LanguageToggle } from "@/components/language-toggle";
 import { LogoutButton } from "@/components/logout-button";
+import { getCartCount } from "@/lib/server/cart";
 
 export async function SiteNav() {
   const t = await getTranslations("Nav");
   const tAuth = await getTranslations("Auth");
   const session = await auth();
+  const cartCount = await getCartCount();
 
   const links = [
     { href: "/", label: t("home") },
@@ -50,8 +52,13 @@ export async function SiteNav() {
         </nav>
 
         <div className="flex items-center gap-4">
-          {/* Cart placeholder — static icon only, no item count / cart logic yet. */}
-          <span className="text-ink" aria-label={t("cart")} title={t("cart")}>
+          {/* Cart — links to /cart with a live item-count badge (Story 3.1). */}
+          <Link
+            href="/cart"
+            className="relative text-ink transition-colors hover:text-sky-deep"
+            aria-label={t("cart")}
+            title={t("cart")}
+          >
             <svg
               width="20"
               height="20"
@@ -64,7 +71,12 @@ export async function SiteNav() {
               <path d="M6 7h12l-1 13H7L6 7Z" strokeLinejoin="round" />
               <path d="M9 7a3 3 0 0 1 6 0" strokeLinecap="round" />
             </svg>
-          </span>
+            {cartCount > 0 ? (
+              <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-sky-deep px-1 text-[10px] font-medium text-white">
+                {cartCount}
+              </span>
+            ) : null}
+          </Link>
 
           {session?.user ? (
             <div className="flex items-center gap-4">
