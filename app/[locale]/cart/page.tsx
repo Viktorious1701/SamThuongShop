@@ -143,15 +143,12 @@ export default async function CartPage() {
           <span className="text-h3 text-ink">{formatVnd(cart.subtotalVnd)}</span>
         </div>
         <p className="text-caption text-ink-muted">{t("shippingNote")}</p>
-        <button
-          type="button"
-          disabled
-          title={t("checkoutSoon")}
-          className="w-full max-w-xs cursor-not-allowed rounded-full bg-surface-sunken px-5 py-3 text-caption text-ink-muted"
+        <Link
+          href="/checkout"
+          className="block w-full max-w-xs rounded-full bg-sky-deep px-5 py-3 text-center text-caption text-white transition-colors hover:bg-[#3D5464]"
         >
           {t("checkout")}
-        </button>
-        <p className="text-caption text-ink-muted">{t("checkoutSoon")}</p>
+        </Link>
       </div>
     </div>
   );

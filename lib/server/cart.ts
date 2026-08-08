@@ -155,3 +155,10 @@ export async function resolveCart(locale: string): Promise<ResolvedCart> {
 export async function getCartCount(): Promise<number> {
   return (await readItems()).reduce((s, i) => s + i.q, 0);
 }
+
+/** Raw cart items for the order service to recompute against (Story 3.2). */
+export async function getCartItems(): Promise<
+  { variantId: string; qty: number }[]
+> {
+  return (await readItems()).map((i) => ({ variantId: i.v, qty: i.q }));
+}
