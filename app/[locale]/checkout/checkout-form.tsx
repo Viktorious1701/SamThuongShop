@@ -17,9 +17,13 @@ const initialState: CheckoutState = { status: "idle" };
 export function CheckoutForm({
   hasPhysical,
   signedIn,
+  canCod,
+  hasDigital,
 }: {
   hasPhysical: boolean;
   signedIn: boolean;
+  canCod: boolean;
+  hasDigital: boolean;
 }) {
   const t = useTranslations("Checkout");
   const [state, formAction] = useActionState(placeOrder, initialState);
@@ -39,6 +43,47 @@ export function CheckoutForm({
           error={err(state.fieldErrors?.email)}
         />
       )}
+
+      <fieldset className="space-y-3">
+        <legend className="text-caption text-ink">{t("paymentHeading")}</legend>
+        {canCod ? (
+          <label className="flex items-start gap-3 rounded-md border border-border p-3 has-[:checked]:border-sky-deep">
+            <input
+              type="radio"
+              name="paymentMethod"
+              value="COD"
+              defaultChecked
+              className="mt-1"
+            />
+            <span>
+              <span className="block text-body text-ink">{t("methodCod")}</span>
+              <span className="block text-caption text-ink-muted">
+                {t("methodCodHint")}
+              </span>
+            </span>
+          </label>
+        ) : null}
+        <label className="flex items-start gap-3 rounded-md border border-border p-3 has-[:checked]:border-sky-deep">
+          <input
+            type="radio"
+            name="paymentMethod"
+            value="VIETQR"
+            defaultChecked={!canCod}
+            className="mt-1"
+          />
+          <span>
+            <span className="block text-body text-ink">{t("methodVietqr")}</span>
+            <span className="block text-caption text-ink-muted">
+              {t("methodVietqrHint")}
+            </span>
+          </span>
+        </label>
+        {hasDigital ? (
+          <p className="text-caption text-ink-muted">
+            {t("codUnavailableDigital")}
+          </p>
+        ) : null}
+      </fieldset>
 
       {hasPhysical ? (
         <fieldset className="space-y-4">

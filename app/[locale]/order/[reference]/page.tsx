@@ -3,6 +3,8 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getOrderByReference } from "@/lib/server/order";
 import { formatVnd } from "@/lib/format";
+import { OrderStatusPill } from "@/components/order-status-pill";
+import type { OrderStatus } from "@/lib/generated/prisma/enums";
 
 type Params = { params: Promise<{ reference: string }> };
 
@@ -44,9 +46,13 @@ export default async function OrderPage({ params }: Params) {
       <h1 className="mt-1 text-h1 text-ink">
         {t("orderTitle")} {order.reference}
       </h1>
-      <p className="mt-2 text-body text-ink-muted">
-        {t("statusLabel")}: {t(`status_${order.status}`)}
-      </p>
+      <div className="mt-3 flex items-center gap-2">
+        <span className="text-body text-ink-muted">{t("statusLabel")}:</span>
+        <OrderStatusPill
+          status={order.status as OrderStatus}
+          label={t(`status_${order.status}`)}
+        />
+      </div>
 
       <ul className="mt-8 divide-y divide-border border-y border-border">
         {order.lines.map((line, i) => (
@@ -94,9 +100,15 @@ export default async function OrderPage({ params }: Params) {
       ) : null}
 
       <div className="mt-8 rounded-md border border-border bg-surface-sunken p-4">
-        <p className="text-caption text-ink">{t("paymentNextTitle")}</p>
+        <p className="text-caption text-ink">
+          {order.paymentMethod === "COD"
+            ? t("codPlacedTitle")
+            : t("paymentNextTitle")}
+        </p>
         <p className="mt-1 text-caption text-ink-muted">
-          {t("paymentNextBody")}
+          {order.paymentMethod === "COD"
+            ? t("codPlacedBody")
+            : t("paymentNextBody")}
         </p>
       </div>
 

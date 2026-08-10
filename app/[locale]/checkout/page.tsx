@@ -26,6 +26,10 @@ export default async function CheckoutPage() {
   if (cart.lines.length === 0) redirect(`/${locale}/cart`);
 
   const hasPhysical = cart.lines.some((l) => l.format === "PRINT");
+  const hasDigital = cart.lines.some((l) => l.format === "DIGITAL");
+  // COD is offered only for prints-only carts (AD-8) — a digital line has
+  // nothing to collect cash for on delivery.
+  const canCod = hasPhysical && !hasDigital;
   const shippingFeeVnd = hasPhysical
     ? (await getStoreSettings()).shippingFeeVnd
     : 0;
@@ -44,7 +48,12 @@ export default async function CheckoutPage() {
               {t("signedInAs")} {session.user.email}
             </p>
           ) : null}
-          <CheckoutForm hasPhysical={hasPhysical} signedIn={!!session?.user} />
+          <CheckoutForm
+            hasPhysical={hasPhysical}
+            signedIn={!!session?.user}
+            canCod={canCod}
+            hasDigital={hasDigital}
+          />
         </div>
 
         {/* Order summary */}

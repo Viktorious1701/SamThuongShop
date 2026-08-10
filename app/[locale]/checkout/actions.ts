@@ -33,9 +33,18 @@ export async function placeOrder(
   const variants = await getVariantsByIds(items.map((i) => i.variantId));
   const hasPhysical = variants.some((v) => v.format === "PRINT");
 
+  // Payment method — server truth. COD is only valid on a prints-only cart
+  // (AD-8); anything else falls back to VIETQR. createOrder re-guards too.
+  const canCod = hasPhysical && !variants.some((v) => v.format === "DIGITAL");
+  const paymentMethod =
+    String(formData.get("paymentMethod") ?? "") === "COD" && canCod
+      ? "COD"
+      : "VIETQR";
+
   const email = session?.user?.email ?? String(formData.get("email") ?? "");
   const raw = {
     email,
+    paymentMethod,
     shipName: String(formData.get("shipName") ?? ""),
     shipPhone: String(formData.get("shipPhone") ?? ""),
     shipAddress: String(formData.get("shipAddress") ?? ""),
@@ -64,6 +73,7 @@ export async function placeOrder(
     items,
     locale,
     email,
+    paymentMethod,
     userId: session?.user?.id ?? null,
     shipping: hasPhysical
       ? {
