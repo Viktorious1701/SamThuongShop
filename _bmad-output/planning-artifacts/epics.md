@@ -11,6 +11,8 @@ inputDocuments:
 
 ## Overview
 
+> **Revised 2026-10-29 — portfolio-first pivot.** See `sprint-change-proposal-2026-10-29.md`. Execution order is now **3.8 → 1.6 → 1.9 → 1.7 → 1.10 → 1.8**, then the post-showcase shop phase (**3.3 → 3.5 → 3.6 → 3.7 → 4.3 → 2.6**). Backlog: Journal (field notes + videos).
+
 This document provides the complete epic and story breakdown for SamThuongShop, decomposing the requirements from the PRD, the UX Design contract (DESIGN.md + EXPERIENCE.md), and the Architecture spine into implementable stories.
 
 ## Requirements Inventory
@@ -38,10 +40,12 @@ FR-18: A visitor can reach Sam Thuong / the shop (contact).
 FR-19: The Operator can create/edit/publish/unpublish/delete Products and Variants (name+description in vi+en), prices, images, and upload the digital file + preview.
 FR-20: The Operator can organize Products into Collections and configure store settings (flat shipping fee).
 FR-21: The Operator can view and act on Orders (confirm payment, advance status, record shipment, cancel).
-FR-22: The Operator can edit Portfolio Galleries and About content (vi+en).
+FR-22: The Operator can edit Portfolio Galleries (optionally grouped), Achievements, and About content (vi+en), and mark images/Achievements as Featured for Home.
 FR-23: The Operator signs in to a protected admin area (single privileged role).
 FR-24: A Customer can create and sign in to an optional Account (order history + digital re-download).
 FR-25: A Customer can switch the UI language (Vietnamese ⇄ English) via a site-wide toggle; Vietnamese is the fallback.
+FR-26: A visitor can see Sam Thuong's Achievements grouped by kind — Awards & competitions, Exhibitions, Publications & press, Honours & memberships.
+FR-27: Every visitor is led to the Portfolio first — photo-led Home; nav Portfolio · Achievements · About · Contact · Shop; cart indicator only when non-empty.
 
 ### NonFunctional Requirements
 
@@ -112,15 +116,17 @@ FR-22: Epic 1 — manage portfolio content
 FR-23: Epic 1 — operator authentication
 FR-24: Epic 1 — optional customer accounts
 FR-25: Epic 1 — bilingual language toggle
+FR-26: Epic 1 — achievements
+FR-27: Epic 1 — portfolio-led home & navigation
 
-**All 25 FRs mapped, none orphaned.** (Revised after party-mode validation: FR-24 moved to Epic 1 to resolve the account-checkout dependency inversion; FR-13/FR-14 placed in Epic 3 so the buy→receive→re-download loop is one standalone epic.)
+**All 27 FRs mapped, none orphaned.** (Revised after party-mode validation: FR-24 moved to Epic 1 to resolve the account-checkout dependency inversion; FR-13/FR-14 placed in Epic 3 so the buy→receive→re-download loop is one standalone epic.)
 
 ### Open Questions & Risks
 
 *Surfaced by the party-mode validation round; resolve before the cited stories.*
 
 **Open questions (owner decision needed):**
-- OQ-1 — **Contact form (FR-18) target:** email-to-operator via Resend, an admin inbox, or listed Zalo/email links? *(Epic 1)*
+- OQ-1 — **Contact form (FR-18) target:** *RESOLVED 2026-10-29* — enquiry form (name, email, type: print / licensing / collaboration / other, message) emailed to the Operator via Resend, plus listed email / Facebook / Zalo. *(Epic 1)*
 - OQ-2 — **Download-link policy:** expiry window + re-download count (PRD Open Q5). *(Epic 3)*
 - OQ-3 — **Print sizes & digital tiers:** concrete Variant options (PRD Open Q4). *(Epic 2)*
 
@@ -131,29 +137,32 @@ FR-25: Epic 1 — bilingual language toggle
 
 ## Epic List
 
-### Epic 1: Foundation, Portfolio, Accounts & Operator Access
-The bilingual (VN/EN) SamThuongShop site is live, responsive, and styled in the Sky & Sedge system; visitors browse the portfolio galleries, read About, and use contact; customers can create and sign in to optional accounts; and the Operator signs into a single admin shell to manage portfolio & About content. Establishes the foundation every later epic builds on — the Next.js scaffold, design tokens, i18n, the layered structure, one Auth.js system (operator + customer), and the guarded admin shell (built **once** here; later epics drop screens into it).
-**FRs covered:** FR-16, FR-17, FR-18, FR-22, FR-23, FR-24, FR-25
+### Epic 1: Foundation & Portfolio Showcase (galleries, achievements, about, contact)
+The bilingual (VN/EN) site is live and **portfolio-first**: visitors land on a photo-led Home, browse the galleries, see Sam Thuong's achievements, read About and get in touch; the Operator manages all of it from the admin shell. Customers can create and sign in to optional accounts. Establishes the foundation every later epic builds on — the Next.js scaffold, design tokens, i18n, the layered structure, one Auth.js system (operator + customer), and the guarded admin shell (built **once** here; later epics drop screens into it).
+**FRs covered:** FR-16, FR-17, FR-18, FR-22, FR-23, FR-24, FR-25, FR-26, FR-27
 **Build notes:** AR-1/AR-2/AR-3 (scaffold, stack, layered paradigm), AR-8 (i18n), AR-9 (Auth.js — operator role + customer accounts, operator seeded), UX-DR1 (tokens), UX-DR2/UX-DR8 (nav, language-toggle, footer, gallery + lightbox), UX-DR5/UX-DR6 (bilingual, responsive), UX-DR4 (a11y floor). Split Story 1 (do not bundle scaffold + tokens + shell + auth into one story).
 
 ### Epic 2: Product Catalog (manage + browse)
+*Secondary (shop). Remaining stories are scheduled after Epic 1's showcase stories — see Sprint Change Proposal 2026-10-29.*
 The Operator creates and edits Products, Variants, and Collections from the admin shell — bilingual name/description, VND prices, images, the digital file + a watermarked preview — and customers browse the catalog, search, and open a Product detail showing variants (print sizes / digital tiers), VND price, watermarked preview, made-to-order availability, and the license.
 **FRs covered:** FR-1, FR-2, FR-3, FR-15, FR-19, FR-20
 **Build notes:** AR-11 (variant format), AR-7 (watermark pipeline — see R-2 spike), UX-DR2 (product-card, variant-selector, watermark-badge), UX-DR3 (made-to-order, search-no-results, unpublished-product states). Depends on Epic 1 (foundation + admin shell + auth). Needs OQ-3 (sizes/tiers).
 
 ### Epic 3: Cart, Checkout, Payment & Digital Delivery
+*Secondary (shop). Remaining stories are scheduled after Epic 1's showcase stories — see Sprint Change Proposal 2026-10-29.*
 A customer adds items to a cart, checks out as a guest or signed-in account, pays via **VietQR or COD**, receives an order + email confirmation, and — for digital items — immediately receives a secure download link and can re-download it later. The complete buy → receive loop in one standalone epic.
 **FRs covered:** FR-4, FR-5, FR-6, FR-7, FR-8, FR-9, FR-10, FR-13, FR-14
 **Build notes:** AR-4 (money model), AR-5 (order status machine), AR-6 (payOS webhook integration — see R-1 registration, R-3 no sandbox), AR-7 (delivery/grant), AR-10 (confirmation + download-link email), UX-DR2/UX-DR3 (cart-line, empty-cart, payment-pending/failed, digital-success, expired→re-download, guest lookup), UX-DR7 (Lan + Minh flows). Depends on Epic 2 (products) + Epic 1 (accounts). Needs OQ-2 (download policy).
 
 ### Epic 4: Operator Order Fulfillment
+*Secondary (shop). Remaining stories are scheduled after Epic 1's showcase stories — see Sprint Change Proposal 2026-10-29.*
 The Operator views orders, advances status, records shipment for prints, confirms manual payments, and cancels orders — all from the admin shell.
 **FRs covered:** FR-11, FR-12, FR-21
 **Build notes:** AR-5 (status machine), UX-DR2 (status-pill), UX-DR3 (order states). Depends on Epic 3 (orders exist). Standalone: operator order management.
 
-## Epic 1: Foundation, Portfolio, Accounts & Operator Access
+## Epic 1: Foundation & Portfolio Showcase
 
-Establish the running, bilingual, styled site; the one auth system; the admin shell; and the visitor-facing portfolio, About, and contact.
+Establish the running, bilingual, styled site; the one auth system; the admin shell; and the portfolio-first visitor experience — galleries, achievements, About, contact, and a photo-led Home.
 
 ### Story 1.1: Scaffold and deploy the application
 
@@ -198,6 +207,8 @@ So that I can read it in my language. *(FR-25)*
 **And** a missing translation falls back to Vietnamese
 **And** the layout survives longer Vietnamese strings without breaking.
 
+*Nav order superseded by Story 1.10 (portfolio-first).*
+
 ### Story 1.4: Customer accounts
 
 As a customer,
@@ -230,15 +241,18 @@ So that only I can manage the shop, and later epics have one place to add screen
 
 As a visitor,
 I want to browse Sam Thuong's portfolio galleries,
-So that I can experience his work. *(FR-16, FR-22)*
+So that I can experience his work — the main reason the site exists. *(FR-16, FR-22)*
 
 **Acceptance Criteria:**
 
-**Given** the Operator manages Galleries and their images from the admin shell
-**When** a visitor opens the Portfolio
-**Then** a responsive gallery grid renders the images with "{Species} — {location}" captions and alt text
-**And** clicking an image opens an accessible lightbox (focus trapped + restored, `Esc` closes, reduced-motion honored) that may link to a related Product
-**And** images load via next/image with reserved aspect ratios (no layout shift).
+**Given** the Operator manages Galleries (bilingual name, order, optional parent Gallery — one level of grouping, e.g. "Chim Việt Nam" → "Tràm Chim", "Chim Thế Giới" → "Costa Rica") and their images (upload to public storage, species name in Vietnamese and English, location, order, Featured flag, optional linked Product) from the admin shell
+**When** a visitor opens Portfolio
+**Then** they see the gallery groups, each with its child Galleries and a "View all / Xem tất cả" entry, and can open a Gallery into a responsive masonry/asymmetric grid
+**And** every caption shows both species names ("Bồng chanh đỏ · Black-backed Kingfisher") plus location; alt text follows "{Species} — {location}" in the active locale
+**And** clicking an image opens an accessible lightbox (focus trapped + restored, arrow keys/swipe, `Esc` closes, reduced-motion honored)
+**And** an image linked to a published Product shows "View this print / Xem bản in này"; otherwise no purchase affordance
+**And** images load via next/image with reserved aspect ratios (no layout shift), lazy below the fold; portfolio display images carry no watermark
+**And** the Gallery/PortfolioImage tables are created by this story.
 
 ### Story 1.7: About / profile (manage + view)
 
@@ -251,20 +265,54 @@ So that I can judge his professional standing. *(FR-17, FR-22)*
 **Given** the Operator edits bilingual (vi/en) About content from the admin shell
 **When** a visitor opens About in either locale
 **Then** the profile/bio renders in that locale (Vietnamese fallback if untranslated)
-**And** per-locale page metadata / OpenGraph is emitted.
+**And** per-locale page metadata / OpenGraph is emitted
+**And** About links onward to Portfolio and Achievements (no dead end).
 
 ### Story 1.8: Contact
 
 As a visitor,
 I want to reach Sam Thuong / the shop,
-So that I can ask about his work. *(FR-18)*
+So that I can ask about his work, a collaboration, licensing or a print. *(FR-18)*
 
 **Acceptance Criteria:**
 
-**Given** the contact surface *(mechanism per OQ-1 — email via Resend, admin inbox, or listed channels)*
-**When** a visitor uses Contact
-**Then** they can reach the shop through the chosen mechanism
-**And** any form uses labelled fields with non-color required markers and inline validation.
+**Given** the contact surface *(OQ-1 resolved: enquiry form via Resend + listed channels)*
+**When** a visitor submits the form (name, email, enquiry type — print / licensing / collaboration / other — and message)
+**Then** the Operator receives it by email and the visitor sees a calm bilingual confirmation
+**And** listed channels (email, Facebook, Zalo) are shown alongside the form
+**And** the form uses labelled fields with non-color required markers and inline validation, and is protected against spam (honeypot + rate limit).
+
+### Story 1.9: Achievements (manage + view)
+
+As a visitor,
+I want to see Sam Thuong's awards, exhibitions, publications and honours,
+So that I can judge his professional standing. *(FR-26, FR-22)*
+
+**Acceptance Criteria:**
+
+**Given** the Operator creates, edits, orders and deletes Achievements from the admin shell — each with a kind (Award / Exhibition / Publication / Honour), bilingual title and optional description/excerpt (a publication shows outlet + excerpt + link, like press cards), year/date, organiser/venue/outlet, optional external link, optional image (public storage or an existing portfolio image), and a Featured flag
+**When** a visitor opens Achievements in either locale
+**Then** Achievements render grouped as Awards & competitions · Exhibitions · Publications & press · Honours & memberships, newest first, in the active locale with Vietnamese fallback
+**And** empty groups are hidden; external links open in a new tab with an accessible label
+**And** per-locale page metadata / OpenGraph is emitted
+**And** the Achievement table is created by this story.
+
+### Story 1.10: Portfolio-led Home & navigation
+
+As a visitor,
+I want the site to open on Sam Thuong's photographs and lead me through his work,
+So that I see the portfolio before anything else. *(FR-27, FR-16, FR-26)*
+
+**Acceptance Criteria:**
+
+**Given** Galleries with Featured images (1.6) and Featured Achievements (1.9)
+**When** I open Home in either locale
+**Then** I see a full-bleed hero photograph (Operator-chosen, or the first Featured image), a one-line bilingual intro, then one featured grid per gallery group (e.g. Chim Việt Nam, Chim Thế Giới), each with "View all / Xem tất cả" → that group, a strip of highlighted Achievements → Achievements, and an About hook
+**And** any Shop entry on Home is a single secondary link below the fold (SM-C3)
+**And** the primary nav (desktop + mobile) reads **Portfolio · Achievements · About · Contact · Shop**, with the wordmark linking Home
+**And** the cart icon renders only when the cart is non-empty; Login/Account moves to the footer and Shop surfaces
+**And** the hero is the priority image; the rest lazy-load with reserved aspect ratios; no auto-playing carousel
+**And** Home emits per-locale OpenGraph using the hero image.
 
 ## Epic 2: Product Catalog (manage + browse)
 
@@ -344,6 +392,8 @@ So that I can choose a variant and decide to buy. *(FR-2, FR-15)*
 
 ### Story 2.6: Search and not-found states
 
+*Deferred — post-showcase shop phase (Sprint Change Proposal 2026-10-29). ACs unchanged.*
+
 As a customer,
 I want to search for a bird and get graceful results,
 So that I'm never stuck on a blank or broken page. *(FR-3)*
@@ -390,6 +440,8 @@ So that I can confirm before paying. *(FR-5, FR-6, FR-7)*
 
 ### Story 3.3: Pay by VietQR (payOS)
 
+*Deferred — post-showcase shop phase (Sprint Change Proposal 2026-10-29). ACs unchanged.*
+
 As a customer,
 I want to pay by scanning a VietQR code,
 So that I can complete my purchase the way I normally pay. *(FR-8, FR-9)*
@@ -419,6 +471,8 @@ So that I don't need to pay online. *(FR-8)*
 
 ### Story 3.5: Order confirmation, email, and status
 
+*Deferred — post-showcase shop phase (Sprint Change Proposal 2026-10-29). ACs unchanged.*
+
 As a customer,
 I want confirmation and a way to check my order,
 So that I know it went through. *(FR-10)*
@@ -432,6 +486,8 @@ So that I know it went through. *(FR-10)*
 **And** the order status pill shows the correct state with an ink label + colored dot (not color alone).
 
 ### Story 3.6: Digital delivery on payment
+
+*Deferred — post-showcase shop phase (Sprint Change Proposal 2026-10-29). ACs unchanged.*
 
 As a customer who bought a digital image,
 I want to receive my download as soon as I've paid,
@@ -448,6 +504,8 @@ So that I get what I paid for immediately. *(FR-13)*
 
 ### Story 3.7: Re-download
 
+*Deferred — post-showcase shop phase (Sprint Change Proposal 2026-10-29). ACs unchanged.*
+
 As a customer,
 I want to get my file again if the link expires,
 So that I don't lose my purchase. *(FR-14)*
@@ -459,6 +517,23 @@ So that I don't lose my purchase. *(FR-14)*
 **Then** a signed-in customer re-downloads from account order history, and a guest requests a fresh link via Order reference + purchaser email
 **And** an expired link shows a neutral "This link has expired / Liên kết đã hết hạn" with a re-issue action (not an error)
 **And** a cancelled Order's grants are invalidated and cannot be re-issued.
+
+### Story 3.8: Interim prints-only, COD-only shop
+
+*Execute first in the revised order (Sprint Change Proposal 2026-10-29, risk §2.4).*
+
+As the Operator,
+I want the live shop to offer only what I can actually fulfil today,
+So that no visitor places an order that can never complete. *(AD-4, AD-8)*
+
+**Acceptance Criteria:**
+
+**Given** payOS (3.3) and digital delivery (3.6) are not yet live
+**When** the shop runs with online payment and digital sales switched off (a single server-side config switch)
+**Then** checkout offers **COD only** (the VietQR option is hidden)
+**And** Digital Download Variants are hidden from product detail and cannot be added to the cart (server re-guards)
+**And** a Product whose only Variants are digital does not appear in the storefront
+**And** turning the switch on restores today's behaviour unchanged (3.3/3.6 flip it when they ship).
 
 ## Epic 4: Operator Order Fulfillment
 
@@ -493,6 +568,8 @@ So that customers know their print is on the way. *(FR-11)*
 
 ### Story 4.3: Cancel orders
 
+*Deferred — post-showcase shop phase (Sprint Change Proposal 2026-10-29). ACs unchanged.*
+
 As the Operator,
 I want to cancel orders that can't be fulfilled,
 So that the order list reflects reality. *(FR-12)*
@@ -504,3 +581,9 @@ So that the order list reflects reality. *(FR-12)*
 **Then** it moves to *Cancelled* and is not fulfilled
 **And** any digital DownloadGrants on it are invalidated
 **And** a Cancel racing a *Paid* webhook resolves safely (Paid wins → routes to a refund path rather than a lost update).
+
+## Backlog
+
+### Journal — field notes and videos *(not scheduled)*
+
+Both reference birder sites (Sprint Change Proposal 2026-10-29 §2.5) publish essays/field notes (*tùy bút*) and bird videos. A bilingual Journal page (Operator-authored posts + embedded YouTube videos) fits the portfolio; plan after Story 1.8.
