@@ -9,21 +9,17 @@
 //
 //   - Wrong email/password  -> signIn throws a CredentialsSignin AuthError
 //     (same as the customer flow) -> generic "invalid credentials" error.
-//   - Right credentials, but the account isn't an operator -> the session
-//     Auth.js just created is immediately torn down (signOut) and a clear
-//     "not an operator account" error is shown. The visitor is NEVER left
-//     signed in with a customer session on the login page (that would be
-//     what triggers requireOperator() to bounce them right back here on
-//     their next request — the redirect loop AC-4 calls out).
-//   - Right credentials, operator account -> redirect to /admin.
-//
-// `signIn(..., { redirect: false })` returns instead of throwing on
-// success, which is what lets this action inspect the role before
-// deciding whether to redirect or roll the session back.
+//   - Right credentials, but the account isn't an operator -> a clear "not
+//     an operator account" error, and NO session is ever created (the role
+//     is checked before signIn), so the visitor is never left signed in with
+//     a customer session on the login page (the redirect loop AC-4 calls
+//     out).
+//   - Right credentials, operator account -> signIn, redirect to /admin.
 
 import { z } from "zod";
 import { AuthError } from "next-auth";
-import { auth, signIn, signOut } from "@/auth";
+import { signIn, signOut } from "@/auth";
+import { authenticateUser } from "@/lib/server/user";
 import { redirect } from "next/navigation";
 
 const adminLoginSchema = z.object({
@@ -57,6 +53,19 @@ export async function adminLoginAction(
     return { status: "error", fieldErrors };
   }
 
+  // Check credentials + role BEFORE creating a session. Reading the session
+  // back with auth() right after signIn() doesn't work: auth() sees only the
+  // cookies the browser sent with this request, not the one signIn() just
+  // set — so the first attempt was always rejected (and a non-operator was
+  // left holding a session cookie the same-request signOut couldn't clear).
+  const user = await authenticateUser(parsed.data.email, parsed.data.password);
+  if (!user) {
+    return { status: "error", formError: "Incorrect email or password." };
+  }
+  if (user.role !== "operator") {
+    return { status: "error", formError: "This isn't an operator account." };
+  }
+
   try {
     await signIn("credentials", {
       email: parsed.data.email,
@@ -68,18 +77,6 @@ export async function adminLoginAction(
       return { status: "error", formError: "Incorrect email or password." };
     }
     throw error;
-  }
-
-  const session = await auth();
-
-  if (session?.user?.role !== "operator") {
-    // Successful login, wrong role — never leave a non-operator session
-    // sitting around for requireOperator() to bounce again.
-    await signOut({ redirect: false });
-    return {
-      status: "error",
-      formError: "This isn't an operator account.",
-    };
   }
 
   redirect("/admin");
