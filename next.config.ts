@@ -17,6 +17,23 @@ function r2ImagePatterns(): NextConfig["images"] {
 
 const nextConfig: NextConfig = {
   images: r2ImagePatterns(),
+
+  // Portfolio-only revamp (R2): the portfolio moved to /work, and Contact is
+  // now a section of About. Old links (shared before the revamp) keep working.
+  async redirects() {
+    return [
+      {
+        source: "/:locale(vi|en)/portfolio/:path*",
+        destination: "/:locale/work/:path*",
+        permanent: true,
+      },
+      {
+        source: "/:locale(vi|en)/contact",
+        destination: "/:locale/about#contact",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 const withNextIntl = createNextIntlPlugin();

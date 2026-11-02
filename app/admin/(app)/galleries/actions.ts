@@ -11,16 +11,16 @@ import { revalidatePath } from "next/cache";
 import { requireOperator } from "@/lib/server/require-operator";
 import { deleteObject, presignUpload } from "@/lib/server/storage";
 import {
-  PORTFOLIO_ORIGINAL_PREFIX,
-  isPortfolioOriginalKey,
-  processPortfolioUpload,
+  isOriginalKey,
+  originalPrefix,
+  processDisplayUpload,
 } from "@/lib/server/portfolio-image";
 import {
   addPortfolioImage,
-  canHoldImages,
   createGallery,
   deleteGallery,
   deletePortfolioImage,
+  galleryExists,
   moveGallery,
   moveImage,
   setGalleryPublished,
@@ -105,8 +105,7 @@ export async function deleteGalleryAction(id: string): Promise<{ ok: true } | Fa
 
 /**
  * Step 1 of an upload (D5/D6): a presigned PUT into the PRIVATE bucket under
- * the portfolio-originals prefix. Checked against the gallery first so a group
- * never ends up with orphaned uploads.
+ * the portfolio-originals prefix, after checking the gallery still exists.
  */
 export async function createPortfolioUploadUrl(input: {
   galleryId: string;
@@ -122,14 +121,15 @@ export async function createPortfolioUploadUrl(input: {
   }
   if (!ext) return { ok: false, error: "Could not determine the file extension." };
 
-  const allowed = await canHoldImages(input.galleryId);
-  if (!allowed.ok) return allowed;
+  if (!(await galleryExists(input.galleryId))) {
+    return { ok: false, error: "This gallery no longer exists." };
+  }
 
   const { key, url } = await presignUpload({
     scope: "private",
     contentType,
     ext,
-    prefix: PORTFOLIO_ORIGINAL_PREFIX,
+    prefix: originalPrefix("portfolio"),
   });
   return { ok: true, key, url };
 }
@@ -145,13 +145,13 @@ export async function processPortfolioImageAction(
 ): Promise<{ ok: true; image: AdminImage } | Fail> {
   await requireOperator();
 
-  if (!isPortfolioOriginalKey(originalKey)) {
+  if (!isOriginalKey("portfolio", originalKey)) {
     return { ok: false, error: "Upload the image first." };
   }
 
   let processed;
   try {
-    processed = await processPortfolioUpload(originalKey);
+    processed = await processDisplayUpload("portfolio", originalKey);
   } catch {
     return {
       ok: false,
@@ -172,7 +172,7 @@ export async function processPortfolioImageAction(
  * private original so the archive doesn't collect orphans. */
 export async function discardPortfolioOriginalAction(originalKey: string): Promise<void> {
   await requireOperator();
-  if (!isPortfolioOriginalKey(originalKey)) return;
+  if (!isOriginalKey("portfolio", originalKey)) return;
   await deleteObject({ scope: "private", key: originalKey }).catch(() => {});
 }
 

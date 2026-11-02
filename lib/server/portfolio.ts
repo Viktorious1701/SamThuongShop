@@ -1,25 +1,19 @@
 // lib/server/portfolio.ts
 //
-// Story 1.6 — all Gallery / PortfolioImage Prisma access (AD-2 — one service
-// module per aggregate; only lib/server imports Prisma). Admin Server Actions
-// delegate here; public pages read the client-safe DTOs below (no private
-// originalKey ever leaves this module on the public path).
+// All Gallery / PortfolioImage Prisma access (AD-2 — only lib/server imports
+// Prisma). Story 1.6, simplified by the portfolio-only revamp (2026-11-02):
 //
-// Rules enforced here (plan §2.4):
-//   D1  two levels max — a group's parent must be top-level; a gallery that
-//       has children can't itself get a parent.
-//   D2  images only in leaf galleries — a gallery holding images can't become
-//       a parent, and a group can't receive uploads.
-//   D3  public reads: only published galleries; a group shows only through
-//       its published children that have images; a child needs its parent
-//       published too.
-//   D11 "View this print" only for a published Product with a sellable variant.
-//   D13 a gallery can't be deleted while it has images or children.
+//   • Galleries are ONE level of categories (Birds, Sport & Events, …). The
+//     old parent/group column is ignored (kept in the schema, unused).
+//   • A photo has a caption + place/date per language (was "species"), a
+//     Featured flag and an order. The print link is gone from the UI.
+//   • Public reads only return published galleries that have photos; no
+//     private originalKey ever leaves this module on the public path.
+//   • A gallery can't be deleted while it still holds photos.
 
 import { prisma } from "@/lib/server/db";
 import { deleteObject, publicUrl } from "@/lib/server/storage";
-import { sellableVariantWhere } from "@/lib/server/product";
-import type { ProcessedPortfolioImage } from "@/lib/server/portfolio-image";
+import type { ProcessedImage } from "@/lib/server/portfolio-image";
 import type {
   GalleryInput,
   ImageDetailsInput,
@@ -31,29 +25,30 @@ export type Result<T = undefined> =
 
 export type MoveDirection = "up" | "down";
 
-// --- admin DTOs ------------------------------------------------------------
+// --- DTOs ------------------------------------------------------------------
 
-export type AdminGalleryNode = {
+export type CaptionFields = {
+  captionVi: string | null;
+  captionEn: string | null;
+  locationVi: string | null;
+  locationEn: string | null;
+};
+
+export type AdminGalleryRow = {
   id: string;
   slug: string;
   nameVi: string;
   nameEn: string;
   published: boolean;
   imageCount: number;
-  children: Omit<AdminGalleryNode, "children">[];
 };
 
-export type AdminImage = {
+export type AdminImage = CaptionFields & {
   id: string;
   url: string;
   width: number;
   height: number;
-  speciesVi: string | null;
-  speciesEn: string | null;
-  locationVi: string | null;
-  locationEn: string | null;
   featured: boolean;
-  productId: string | null;
 };
 
 export type AdminGallery = {
@@ -63,27 +58,17 @@ export type AdminGallery = {
   nameEn: string;
   descriptionVi: string | null;
   descriptionEn: string | null;
-  parentId: string | null;
   published: boolean;
-  childCount: number;
   images: AdminImage[];
 };
 
-export type ParentOption = { id: string; nameEn: string; nameVi: string };
-
-// --- public DTOs (client-safe) ---------------------------------------------
-
-export type PublicImage = {
+/** Client-safe photo (public pages). */
+export type PublicImage = CaptionFields & {
   id: string;
   url: string;
   width: number;
   height: number;
   blurDataUrl: string;
-  speciesVi: string | null;
-  speciesEn: string | null;
-  locationVi: string | null;
-  locationEn: string | null;
-  printSlug: string | null; // set only when the linked print is buyable (D11)
 };
 
 export type GalleryCard = {
@@ -91,24 +76,8 @@ export type GalleryCard = {
   nameVi: string;
   nameEn: string;
   imageCount: number;
-  cover: Pick<PublicImage, "url" | "width" | "height" | "blurDataUrl"> & {
-    speciesVi: string | null;
-    speciesEn: string | null;
-  };
-};
-
-export type PortfolioGroup = {
-  slug: string;
-  nameVi: string;
-  nameEn: string;
-  descriptionVi: string | null;
-  descriptionEn: string | null;
-  galleries: GalleryCard[];
-};
-
-export type PortfolioOverview = {
-  groups: PortfolioGroup[];
-  standalone: GalleryCard[]; // top-level galleries with no group
+  cover: Pick<PublicImage, "url" | "width" | "height" | "blurDataUrl"> &
+    Pick<CaptionFields, "captionVi" | "captionEn">;
 };
 
 type GalleryHeading = {
@@ -119,20 +88,25 @@ type GalleryHeading = {
   descriptionEn: string | null;
 };
 
-export type PortfolioPage =
-  | {
-      kind: "gallery";
-      gallery: GalleryHeading;
-      parent: Pick<GalleryHeading, "slug" | "nameVi" | "nameEn"> | null;
-      images: PublicImage[];
-    }
-  | {
-      kind: "group";
-      gallery: GalleryHeading;
-      sections: { gallery: GalleryHeading; images: PublicImage[] }[];
-    };
+type GalleryLink = Pick<GalleryHeading, "slug" | "nameVi" | "nameEn">;
 
-// --- helpers ---------------------------------------------------------------
+export type GalleryPage = {
+  gallery: GalleryHeading;
+  images: PublicImage[];
+  previous: GalleryLink | null;
+  next: GalleryLink | null;
+};
+
+/** For the admin "hero photo" picker. */
+export type ImageOption = {
+  id: string;
+  url: string;
+  galleryNameEn: string;
+  captionEn: string | null;
+  captionVi: string | null;
+};
+
+// --- helpers -----------------------------------------------------------------
 
 /** URL-safe slug from the English name (đ → d, diacritics stripped). */
 function slugify(name: string): string {
@@ -185,13 +159,21 @@ async function swapWithNeighbour(
   await Promise.all(next.map((r, position) => write(r.id, position)));
 }
 
-const sellableProductSelect = () => ({
-  select: {
-    slug: true,
-    published: true,
-    variants: { where: sellableVariantWhere(), select: { id: true }, take: 1 },
-  },
-});
+const imageOrder = [{ position: "asc" as const }, { createdAt: "asc" as const }];
+const galleryOrder = [{ position: "asc" as const }, { createdAt: "asc" as const }];
+
+const publicImageSelect = {
+  id: true,
+  key: true,
+  width: true,
+  height: true,
+  blurDataUrl: true,
+  captionVi: true,
+  captionEn: true,
+  locationVi: true,
+  locationEn: true,
+  featured: true,
+} as const;
 
 type PublicImageRow = {
   id: string;
@@ -199,64 +181,64 @@ type PublicImageRow = {
   width: number;
   height: number;
   blurDataUrl: string;
-  speciesVi: string | null;
-  speciesEn: string | null;
-  locationVi: string | null;
-  locationEn: string | null;
-  product: { slug: string; published: boolean; variants: { id: string }[] } | null;
-};
+  featured: boolean;
+} & CaptionFields;
 
 function toPublicImage(row: PublicImageRow): PublicImage {
-  const p = row.product;
   return {
     id: row.id,
     url: publicUrl(row.key),
     width: row.width,
     height: row.height,
     blurDataUrl: row.blurDataUrl,
-    speciesVi: row.speciesVi,
-    speciesEn: row.speciesEn,
+    captionVi: row.captionVi,
+    captionEn: row.captionEn,
     locationVi: row.locationVi,
     locationEn: row.locationEn,
-    printSlug: p && p.published && p.variants.length > 0 ? p.slug : null,
   };
 }
 
-const imageOrder = [{ position: "asc" as const }, { createdAt: "asc" as const }];
-const galleryOrder = [{ position: "asc" as const }, { createdAt: "asc" as const }];
+function toAdminImage(row: {
+  id: string;
+  key: string;
+  width: number;
+  height: number;
+  featured: boolean;
+} & CaptionFields): AdminImage {
+  return {
+    id: row.id,
+    url: publicUrl(row.key),
+    width: row.width,
+    height: row.height,
+    captionVi: row.captionVi,
+    captionEn: row.captionEn,
+    locationVi: row.locationVi,
+    locationEn: row.locationEn,
+    featured: row.featured,
+  };
+}
 
 // --- admin: galleries --------------------------------------------------------
 
-export async function listGalleryTree(): Promise<AdminGalleryNode[]> {
+export async function listGalleries(): Promise<AdminGalleryRow[]> {
   const rows = await prisma.gallery.findMany({
-    where: { parentId: null },
     orderBy: galleryOrder,
-    include: {
-      _count: { select: { images: true } },
-      children: {
-        orderBy: galleryOrder,
-        include: { _count: { select: { images: true } } },
-      },
-    },
+    include: { _count: { select: { images: true } } },
   });
-  const node = (g: (typeof rows)[number] | (typeof rows)[number]["children"][number]) => ({
+  return rows.map((g) => ({
     id: g.id,
     slug: g.slug,
     nameVi: g.nameVi,
     nameEn: g.nameEn,
     published: g.published,
     imageCount: g._count.images,
-  });
-  return rows.map((g) => ({ ...node(g), children: g.children.map(node) }));
+  }));
 }
 
 export async function getGalleryForEdit(id: string): Promise<AdminGallery | null> {
   const g = await prisma.gallery.findUnique({
     where: { id },
-    include: {
-      _count: { select: { children: true } },
-      images: { orderBy: imageOrder },
-    },
+    include: { images: { orderBy: imageOrder } },
   });
   if (!g) return null;
   return {
@@ -266,76 +248,17 @@ export async function getGalleryForEdit(id: string): Promise<AdminGallery | null
     nameEn: g.nameEn,
     descriptionVi: g.descriptionVi,
     descriptionEn: g.descriptionEn,
-    parentId: g.parentId,
     published: g.published,
-    childCount: g._count.children,
-    images: g.images.map((img) => ({
-      id: img.id,
-      url: publicUrl(img.key),
-      width: img.width,
-      height: img.height,
-      speciesVi: img.speciesVi,
-      speciesEn: img.speciesEn,
-      locationVi: img.locationVi,
-      locationEn: img.locationEn,
-      featured: img.featured,
-      productId: img.productId,
-    })),
+    images: g.images.map(toAdminImage),
   };
 }
 
-/** Galleries that may act as a group parent: top-level and holding no images
- * (D1/D2). `excludeId` drops the gallery being edited. */
-export async function listParentOptions(excludeId?: string): Promise<ParentOption[]> {
-  return prisma.gallery.findMany({
-    where: {
-      parentId: null,
-      images: { none: {} },
-      ...(excludeId ? { id: { not: excludeId } } : {}),
-    },
-    orderBy: galleryOrder,
-    select: { id: true, nameEn: true, nameVi: true },
-  });
-}
-
-/** D1/D2 checks for placing gallery `selfId` (null on create) under `parentId`. */
-async function checkParent(
-  selfId: string | null,
-  parentId: string | null,
-): Promise<string | null> {
-  if (!parentId) return null;
-  if (parentId === selfId) return "A gallery can't be its own group.";
-
-  const parent = await prisma.gallery.findUnique({
-    where: { id: parentId },
-    select: { parentId: true, _count: { select: { images: true } } },
-  });
-  if (!parent) return "That group no longer exists.";
-  if (parent.parentId) return "Groups can only be one level deep — pick a top-level group.";
-  if (parent._count.images > 0) {
-    return "That gallery already holds images, so it can't become a group.";
-  }
-
-  if (selfId) {
-    const children = await prisma.gallery.count({ where: { parentId: selfId } });
-    if (children > 0) {
-      return "This gallery is a group (it has galleries inside it), so it can't be placed in another group.";
-    }
-  }
-  return null;
-}
-
 export async function createGallery(input: GalleryInput): Promise<Result<{ id: string }>> {
-  const problem = await checkParent(null, input.parentId);
-  if (problem) return { ok: false, error: problem };
-
   const slug = input.slug ?? (await uniqueSlug(slugify(input.nameEn)));
   const last = await prisma.gallery.findFirst({
-    where: { parentId: input.parentId },
     orderBy: { position: "desc" },
     select: { position: true },
   });
-
   try {
     const g = await prisma.gallery.create({
       data: {
@@ -344,7 +267,6 @@ export async function createGallery(input: GalleryInput): Promise<Result<{ id: s
         nameEn: input.nameEn,
         descriptionVi: input.descriptionVi,
         descriptionEn: input.descriptionEn,
-        parentId: input.parentId,
         position: (last?.position ?? -1) + 1,
       },
       select: { id: true },
@@ -359,28 +281,10 @@ export async function createGallery(input: GalleryInput): Promise<Result<{ id: s
 }
 
 export async function updateGallery(id: string, input: GalleryInput): Promise<Result> {
-  const current = await prisma.gallery.findUnique({
-    where: { id },
-    select: { parentId: true },
-  });
-  if (!current) return { ok: false, error: "This gallery no longer exists." };
-
-  const problem = await checkParent(id, input.parentId);
-  if (problem) return { ok: false, error: problem };
+  const exists = await prisma.gallery.count({ where: { id } });
+  if (!exists) return { ok: false, error: "This gallery no longer exists." };
 
   const slug = input.slug ?? (await uniqueSlug(slugify(input.nameEn), id));
-
-  // Moving to a different group → append at the end of the new siblings.
-  let position: number | undefined;
-  if (current.parentId !== input.parentId) {
-    const last = await prisma.gallery.findFirst({
-      where: { parentId: input.parentId, id: { not: id } },
-      orderBy: { position: "desc" },
-      select: { position: true },
-    });
-    position = (last?.position ?? -1) + 1;
-  }
-
   try {
     await prisma.gallery.update({
       where: { id },
@@ -390,8 +294,6 @@ export async function updateGallery(id: string, input: GalleryInput): Promise<Re
         nameEn: input.nameEn,
         descriptionVi: input.descriptionVi,
         descriptionEn: input.descriptionEn,
-        parentId: input.parentId,
-        ...(position !== undefined ? { position } : {}),
       },
     });
     return { ok: true };
@@ -404,14 +306,8 @@ export async function updateGallery(id: string, input: GalleryInput): Promise<Re
 }
 
 export async function moveGallery(id: string, direction: MoveDirection): Promise<void> {
-  const g = await prisma.gallery.findUnique({ where: { id }, select: { parentId: true } });
-  if (!g) return;
-  const siblings = await prisma.gallery.findMany({
-    where: { parentId: g.parentId },
-    orderBy: galleryOrder,
-    select: { id: true },
-  });
-  await swapWithNeighbour(siblings, id, direction, (rowId, position) =>
+  const all = await prisma.gallery.findMany({ orderBy: galleryOrder, select: { id: true } });
+  await swapWithNeighbour(all, id, direction, (rowId, position) =>
     prisma.gallery.update({ where: { id: rowId }, data: { position } }),
   );
 }
@@ -426,43 +322,31 @@ export async function deleteGallery(id: string): Promise<Result> {
     select: { _count: { select: { images: true, children: true } } },
   });
   if (!g) return { ok: true };
-  if (g._count.children > 0) {
-    return { ok: false, error: "Move or delete the galleries inside this group first." };
-  }
   if (g._count.images > 0) {
-    return { ok: false, error: "Delete this gallery's images first." };
+    return { ok: false, error: "Delete this gallery's photos first." };
+  }
+  if (g._count.children > 0) {
+    // Only possible for data created before the revamp (old groups).
+    await prisma.gallery.updateMany({ where: { parentId: id }, data: { parentId: null } });
   }
   await prisma.gallery.delete({ where: { id } });
   return { ok: true };
 }
 
-// --- admin: images -----------------------------------------------------------
+// --- admin: photos -------------------------------------------------------------
 
-/** D2 — only a leaf gallery can receive images. Checked before upload so the
- * operator isn't left with orphaned R2 objects. */
-export async function canHoldImages(galleryId: string): Promise<Result> {
-  const g = await prisma.gallery.findUnique({
-    where: { id: galleryId },
-    select: { _count: { select: { children: true } } },
-  });
-  if (!g) return { ok: false, error: "This gallery no longer exists." };
-  if (g._count.children > 0) {
-    return {
-      ok: false,
-      error: "Groups can't hold images — add them to a gallery inside it.",
-    };
-  }
-  return { ok: true };
+export async function galleryExists(galleryId: string): Promise<boolean> {
+  return (await prisma.gallery.count({ where: { id: galleryId } })) > 0;
 }
 
 export async function addPortfolioImage(
   galleryId: string,
   originalKey: string,
-  processed: ProcessedPortfolioImage,
+  processed: ProcessedImage,
 ): Promise<Result<AdminImage>> {
-  const allowed = await canHoldImages(galleryId);
-  if (!allowed.ok) return allowed;
-
+  if (!(await galleryExists(galleryId))) {
+    return { ok: false, error: "This gallery no longer exists." };
+  }
   const last = await prisma.portfolioImage.findFirst({
     where: { galleryId },
     orderBy: { position: "desc" },
@@ -479,31 +363,10 @@ export async function addPortfolioImage(
       position: (last?.position ?? -1) + 1,
     },
   });
-  return {
-    ok: true,
-    data: {
-      id: img.id,
-      url: publicUrl(img.key),
-      width: img.width,
-      height: img.height,
-      speciesVi: null,
-      speciesEn: null,
-      locationVi: null,
-      locationEn: null,
-      featured: false,
-      productId: null,
-    },
-  };
+  return { ok: true, data: toAdminImage(img) };
 }
 
-export async function updateImageDetails(
-  id: string,
-  input: ImageDetailsInput,
-): Promise<Result> {
-  if (input.productId) {
-    const exists = await prisma.product.count({ where: { id: input.productId } });
-    if (!exists) return { ok: false, error: "That product no longer exists." };
-  }
+export async function updateImageDetails(id: string, input: ImageDetailsInput): Promise<Result> {
   await prisma.portfolioImage.update({ where: { id }, data: input });
   return { ok: true };
 }
@@ -524,8 +387,7 @@ export async function moveImage(id: string, direction: MoveDirection): Promise<v
   );
 }
 
-/** Deletes the row, then best-effort removes both R2 objects (AD-15 — keys
- * are owned by the row). A failed object delete never blocks the operator. */
+/** Deletes the row, then best-effort removes both R2 objects (AD-15). */
 export async function deletePortfolioImage(id: string): Promise<void> {
   const img = await prisma.portfolioImage.findUnique({
     where: { id },
@@ -539,31 +401,36 @@ export async function deletePortfolioImage(id: string): Promise<void> {
   ]);
 }
 
-// --- public reads (published-only, client-safe) ------------------------------
+/** Every photo, grouped by gallery order — for the admin hero picker. */
+export async function listImageOptions(): Promise<ImageOption[]> {
+  const rows = await prisma.portfolioImage.findMany({
+    orderBy: [{ gallery: { position: "asc" } }, ...imageOrder],
+    select: {
+      id: true,
+      key: true,
+      captionVi: true,
+      captionEn: true,
+      gallery: { select: { nameEn: true } },
+    },
+  });
+  return rows.map((r) => ({
+    id: r.id,
+    url: publicUrl(r.key),
+    galleryNameEn: r.gallery.nameEn,
+    captionVi: r.captionVi,
+    captionEn: r.captionEn,
+  }));
+}
 
-const publicImageSelect = () => ({
-  id: true,
-  key: true,
-  width: true,
-  height: true,
-  blurDataUrl: true,
-  speciesVi: true,
-  speciesEn: true,
-  locationVi: true,
-  locationEn: true,
-  featured: true,
-  product: sellableProductSelect(),
-});
+// --- public reads (published-only, client-safe) --------------------------------
 
-type CardSourceRow = {
+/** Cover = first Featured photo, else the first photo. */
+function toCard(g: {
   slug: string;
   nameVi: string;
   nameEn: string;
-  images: (PublicImageRow & { featured: boolean })[];
-};
-
-/** Cover = first Featured image, else the first image (plan T01 note). */
-function toCard(g: CardSourceRow): GalleryCard | null {
+  images: PublicImageRow[];
+}): GalleryCard | null {
   if (g.images.length === 0) return null;
   const cover = g.images.find((i) => i.featured) ?? g.images[0];
   return {
@@ -576,88 +443,82 @@ function toCard(g: CardSourceRow): GalleryCard | null {
       width: cover.width,
       height: cover.height,
       blurDataUrl: cover.blurDataUrl,
-      speciesVi: cover.speciesVi,
-      speciesEn: cover.speciesEn,
+      captionVi: cover.captionVi,
+      captionEn: cover.captionEn,
     },
   };
 }
 
-export async function getPortfolioOverview(): Promise<PortfolioOverview> {
-  const top = await prisma.gallery.findMany({
-    where: { parentId: null, published: true },
+const publishedWithPhotos = { published: true, images: { some: {} } };
+
+export async function listGalleryCards(): Promise<GalleryCard[]> {
+  const rows = await prisma.gallery.findMany({
+    where: publishedWithPhotos,
     orderBy: galleryOrder,
-    include: {
-      images: { orderBy: imageOrder, select: publicImageSelect() },
-      children: {
-        where: { published: true },
-        orderBy: galleryOrder,
-        include: { images: { orderBy: imageOrder, select: publicImageSelect() } },
-      },
-    },
+    include: { images: { orderBy: imageOrder, select: publicImageSelect } },
   });
-
-  const groups: PortfolioGroup[] = [];
-  const standalone: GalleryCard[] = [];
-
-  for (const g of top) {
-    if (g.children.length > 0) {
-      const galleries = g.children.map(toCard).filter((c): c is GalleryCard => !!c);
-      if (galleries.length === 0) continue;
-      groups.push({
-        slug: g.slug,
-        nameVi: g.nameVi,
-        nameEn: g.nameEn,
-        descriptionVi: g.descriptionVi,
-        descriptionEn: g.descriptionEn,
-        galleries,
-      });
-    } else {
-      const card = toCard(g);
-      if (card) standalone.push(card);
-    }
-  }
-  return { groups, standalone };
+  return rows.map(toCard).filter((c): c is GalleryCard => !!c);
 }
 
-export async function getPortfolioPage(slug: string): Promise<PortfolioPage | null> {
+export async function getGalleryPage(slug: string): Promise<GalleryPage | null> {
   const g = await prisma.gallery.findUnique({
     where: { slug },
-    include: {
-      parent: { select: { slug: true, nameVi: true, nameEn: true, published: true } },
-      images: { orderBy: imageOrder, select: publicImageSelect() },
-      children: {
-        where: { published: true },
-        orderBy: galleryOrder,
-        include: { images: { orderBy: imageOrder, select: publicImageSelect() } },
-      },
-    },
+    include: { images: { orderBy: imageOrder, select: publicImageSelect } },
   });
-  if (!g || !g.published) return null;
-  if (g.parent && !g.parent.published) return null;
+  if (!g || !g.published || g.images.length === 0) return null;
 
-  const heading = (x: GalleryHeading): GalleryHeading => ({
-    slug: x.slug,
-    nameVi: x.nameVi,
-    nameEn: x.nameEn,
-    descriptionVi: x.descriptionVi,
-    descriptionEn: x.descriptionEn,
+  // Previous / next published gallery, for the pager.
+  const all = await prisma.gallery.findMany({
+    where: publishedWithPhotos,
+    orderBy: galleryOrder,
+    select: { slug: true, nameVi: true, nameEn: true },
   });
+  const i = all.findIndex((x) => x.slug === slug);
 
-  if (g.children.length > 0) {
-    const sections = g.children
-      .filter((c) => c.images.length > 0)
-      .map((c) => ({ gallery: heading(c), images: c.images.map(toPublicImage) }));
-    if (sections.length === 0) return null;
-    return { kind: "group", gallery: heading(g), sections };
-  }
-
-  if (g.images.length === 0) return null;
   return {
-    kind: "gallery",
-    gallery: heading(g),
-    parent: g.parent
-      ? { slug: g.parent.slug, nameVi: g.parent.nameVi, nameEn: g.parent.nameEn }
-      : null,
+    gallery: {
+      slug: g.slug,
+      nameVi: g.nameVi,
+      nameEn: g.nameEn,
+      descriptionVi: g.descriptionVi,
+      descriptionEn: g.descriptionEn,
+    },
     images: g.images.map(toPublicImage),
+    previous: i > 0 ? all[i - 1] : null,
+    next: i >= 0 && i < all.length - 1 ? all[i + 1] : null,
   };
+}
+
+/** Featured photos across published galleries, in gallery then photo order. */
+export async function listFeaturedPhotos(limit = 12): Promise<PublicImage[]> {
+  const rows = await prisma.portfolioImage.findMany({
+    where: { featured: true, gallery: { published: true } },
+    orderBy: [{ gallery: { position: "asc" } }, ...imageOrder],
+    take: limit,
+    select: publicImageSelect,
+  });
+  return rows.map(toPublicImage);
+}
+
+/** The Home hero: the chosen photo, else the first Featured one, else any. */
+export async function getHeroPhoto(heroImageId: string | null): Promise<PublicImage | null> {
+  if (heroImageId) {
+    const chosen = await prisma.portfolioImage.findUnique({
+      where: { id: heroImageId },
+      select: publicImageSelect,
+    });
+    if (chosen) return toPublicImage(chosen);
+  }
+  const fallback =
+    (await prisma.portfolioImage.findFirst({
+      where: { featured: true, gallery: { published: true } },
+      orderBy: [{ gallery: { position: "asc" } }, ...imageOrder],
+      select: publicImageSelect,
+    })) ??
+    (await prisma.portfolioImage.findFirst({
+      where: { gallery: { published: true } },
+      orderBy: [{ gallery: { position: "asc" } }, ...imageOrder],
+      select: publicImageSelect,
+    }));
+  return fallback ? toPublicImage(fallback) : null;
 }

@@ -15,7 +15,6 @@
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
 import { Caption, imageAlt } from "@/components/portfolio/caption";
 import type { PublicImage } from "@/lib/server/portfolio";
 
@@ -206,16 +205,9 @@ export function Lightbox({
           id={captionId}
           locale={locale}
           image={image}
-          className="text-body text-white [&_.text-caption-deep]:text-white/70 [&_.text-ink]:text-white"
+          className="text-body text-white"
+          placeClassName="text-caption text-white/65"
         />
-        {image.printSlug ? (
-          <Link
-            href={`/shop/${image.printSlug}`}
-            className="rounded-full bg-white px-5 py-2.5 text-caption text-ink transition-colors hover:bg-white/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-soft"
-          >
-            {t("viewPrint")} →
-          </Link>
-        ) : null}
       </div>
     </div>
   );

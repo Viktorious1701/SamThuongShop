@@ -2,33 +2,23 @@
 
 // app/admin/(app)/galleries/gallery-editor.tsx
 //
-// Story 1.6 — create/edit a Gallery: bilingual name + description, optional
-// group (parent), optional URL name. English-only (/admin is outside
+// Create/edit a Gallery (one category of work): bilingual name +
+// description and an optional URL name. English-only (/admin is outside
 // next-intl). On create it moves straight to the gallery's page so the
-// operator can start uploading.
+// operator can start uploading. Revamp: no group/parent picker.
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { TextField } from "@/components/form/text-field";
 import { TextareaField } from "@/components/form/textarea-field";
-import { SelectField } from "@/components/form/select-field";
 import { saveGalleryAction } from "./actions";
-import type { AdminGallery, ParentOption } from "@/lib/server/portfolio";
+import type { AdminGallery } from "@/lib/server/portfolio";
 
-export function GalleryEditor({
-  initial,
-  parents,
-}: {
-  initial?: AdminGallery;
-  parents: ParentOption[];
-}) {
+export function GalleryEditor({ initial }: { initial?: AdminGallery }) {
   const router = useRouter();
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
-
-  // A group (has children) can't itself be placed in a group (D1).
-  const isGroup = (initial?.childCount ?? 0) > 0;
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -37,7 +27,6 @@ export function GalleryEditor({
       nameVi: String(form.get("nameVi") ?? ""),
       nameEn: String(form.get("nameEn") ?? ""),
       slug: String(form.get("slug") ?? ""),
-      parentId: String(form.get("parentId") ?? ""),
       descriptionVi: String(form.get("descriptionVi") ?? ""),
       descriptionEn: String(form.get("descriptionEn") ?? ""),
     };
@@ -58,10 +47,6 @@ export function GalleryEditor({
     });
   }
 
-  const parentOptions = [
-    { value: "", label: "— None (top level) —" },
-    ...parents.map((p) => ({ value: p.id, label: `${p.nameEn} · ${p.nameVi}` })),
-  ];
 
   return (
     <form onSubmit={onSubmit} className="max-w-2xl space-y-6" noValidate>
@@ -72,7 +57,7 @@ export function GalleryEditor({
           label="Name (Vietnamese)"
           required
           requiredLabel="Required"
-          placeholder="Tràm Chim"
+          placeholder="Chim"
           defaultValue={initial?.nameVi ?? ""}
         />
         <TextField
@@ -81,37 +66,22 @@ export function GalleryEditor({
           label="Name (English)"
           required
           requiredLabel="Required"
-          placeholder="Tram Chim National Park"
+          placeholder="Birds"
           defaultValue={initial?.nameEn ?? ""}
         />
       </div>
 
-      {isGroup ? (
-        <p className="text-caption text-ink-muted">
-          This is a group — it holds {initial?.childCount} galler
-          {initial?.childCount === 1 ? "y" : "ies"}, so it stays at the top
-          level.
-        </p>
-      ) : (
-        <SelectField
-          id="parentId"
-          name="parentId"
-          label="Group (optional)"
-          options={parentOptions}
-          defaultValue={initial?.parentId ?? ""}
-        />
-      )}
 
       <div className="space-y-1">
         <TextField
           id="slug"
           name="slug"
           label="URL name (optional)"
-          placeholder="tram-chim"
+          placeholder="birds"
           defaultValue={initial?.slug ?? ""}
         />
         <p className="text-caption text-ink-muted">
-          Shown as /portfolio/<em>url-name</em>. Leave blank to make one from
+          Shown as /work/<em>url-name</em>. Leave blank to make one from
           the English name.
         </p>
       </div>

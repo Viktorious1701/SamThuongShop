@@ -257,8 +257,10 @@ model PortfolioImage {
   height      Int
   blurDataUrl String
 
-  speciesVi  String?
-  speciesEn  String?
+  // Portfolio-only revamp: was speciesVi/En — renamed because not every
+  // photo is a bird (sport, landscape, people). Data kept (RENAME COLUMN).
+  captionVi  String?
+  captionEn  String?
   locationVi String?
   locationEn String?
 
@@ -270,9 +272,54 @@ model PortfolioImage {
   productId String?
   product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
 
+  heroFor SiteContent[] @relation("SiteHero") // the Home hero photo
+
   createdAt DateTime @default(now())
 
   @@index([galleryId])
   @@index([featured])
   @@index([productId])
+}
+
+// --- Portfolio-only revamp (2026-11-02) — the site's own content ------------
+// One row (id "site"), edited in /admin/site. Holds everything on the public
+// site that isn't a gallery: the Home hero + tagline, the About page (bio,
+// portrait, record lists) and the contact channels. Bilingual per-locale
+// columns (AD-7; English falls back to Vietnamese).
+model SiteContent {
+  id String @id @default("site")
+
+  // Home
+  heroImageId   String?
+  heroImage     PortfolioImage? @relation("SiteHero", fields: [heroImageId], references: [id], onDelete: SetNull)
+  taglineVi     String?
+  taglineEn     String?
+  aboutTeaserVi String?
+  aboutTeaserEn String?
+
+  // About
+  bioVi String?
+  bioEn String?
+
+  // Portrait: resized public copy + private original (same pipeline as photos).
+  portraitKey         String?
+  portraitOriginalKey String?
+  portraitWidth       Int?
+  portraitHeight      Int?
+  portraitBlurDataUrl String?
+
+  // Record — one entry per line: "2025 | Text | https://optional-link"
+  exhibitionsVi String?
+  exhibitionsEn String?
+  awardsVi      String?
+  awardsEn      String?
+  pressVi       String?
+  pressEn       String?
+
+  // Contact
+  email       String?
+  facebookUrl String?
+  zalo        String?
+
+  updatedAt DateTime @updatedAt
 }

@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { requireOperator } from "@/lib/server/require-operator";
 import { LogoutButton } from "@/components/logout-button";
+import { shopEnabled } from "@/lib/server/shop-config";
 
 // app/admin/(app)/layout.tsx
 //
@@ -11,14 +12,20 @@ import { LogoutButton } from "@/components/logout-button";
 // redirects anyone else to /admin/login, which lives outside this group
 // so it stays reachable (no redirect loop, AC-4).
 //
-// Nav items beyond Dashboard are placeholders — the actual management
-// screens land in later epics/stories. They're rendered as inert labels
-// (not links) so there's nothing 404-ing behind them yet.
-
-// Portfolio (1.6), Products (2.1), Collections + Settings (2.3), Orders
-// (3.4/4.1) are live;
-// the rest arrive in later epics/stories.
-const PLACEHOLDER_NAV = ["About"];
+// Portfolio-only revamp (R2): the operator manages two things — Galleries
+// (with their photos) and Site (hero, About, contact). The shop's screens
+// only appear when SHOP_ENABLED is on (their routes 404 otherwise).
+const MENU = [
+  { href: "/admin", label: "Dashboard" },
+  { href: "/admin/galleries", label: "Galleries" },
+  { href: "/admin/site", label: "Site" },
+];
+const SHOP_MENU = [
+  { href: "/admin/products", label: "Products" },
+  { href: "/admin/orders", label: "Orders" },
+  { href: "/admin/collections", label: "Collections" },
+  { href: "/admin/settings", label: "Shop settings" },
+];
 
 export default async function AdminAppLayout({
   children,
@@ -35,56 +42,14 @@ export default async function AdminAppLayout({
         </div>
 
         <nav aria-label="Admin sections" className="flex flex-1 flex-col gap-1 p-4">
-          <Link
-            href="/admin"
-            className="rounded-md px-3 py-2 text-caption text-ink transition-colors hover:bg-surface-sunken"
-          >
-            Dashboard
-          </Link>
-
-          <Link
-            href="/admin/galleries"
-            className="rounded-md px-3 py-2 text-caption text-ink transition-colors hover:bg-surface-sunken"
-          >
-            Portfolio
-          </Link>
-
-          <Link
-            href="/admin/products"
-            className="rounded-md px-3 py-2 text-caption text-ink transition-colors hover:bg-surface-sunken"
-          >
-            Products
-          </Link>
-
-          <Link
-            href="/admin/orders"
-            className="rounded-md px-3 py-2 text-caption text-ink transition-colors hover:bg-surface-sunken"
-          >
-            Orders
-          </Link>
-
-          <Link
-            href="/admin/collections"
-            className="rounded-md px-3 py-2 text-caption text-ink transition-colors hover:bg-surface-sunken"
-          >
-            Collections
-          </Link>
-
-          <Link
-            href="/admin/settings"
-            className="rounded-md px-3 py-2 text-caption text-ink transition-colors hover:bg-surface-sunken"
-          >
-            Settings
-          </Link>
-
-          {PLACEHOLDER_NAV.map((label) => (
-            <span
-              key={label}
-              aria-disabled="true"
-              className="cursor-not-allowed rounded-md px-3 py-2 text-caption text-ink-muted"
+          {[...MENU, ...(shopEnabled() ? SHOP_MENU : [])].map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="rounded-md px-3 py-2 text-caption text-ink transition-colors hover:bg-surface-sunken"
             >
-              {label} <span className="text-caption-deep">(coming soon)</span>
-            </span>
+              {item.label}
+            </Link>
           ))}
         </nav>
       </aside>

@@ -13,6 +13,16 @@ function flag(name: string): boolean {
   return process.env[name] === "true";
 }
 
+/**
+ * Portfolio-only revamp (2026-11-02) — the whole Shop (catalog, cart,
+ * checkout, accounts, orders, and its admin screens) is switched OFF unless
+ * SHOP_ENABLED="true". The code is kept, not deleted: the (shop) route-group
+ * layouts 404 every shop URL while this is off.
+ */
+export function shopEnabled(): boolean {
+  return flag("SHOP_ENABLED");
+}
+
 /** VietQR via payOS is offered at checkout (Story 3.3). */
 export function onlinePaymentEnabled(): boolean {
   return flag("SHOP_ONLINE_PAYMENT_ENABLED");

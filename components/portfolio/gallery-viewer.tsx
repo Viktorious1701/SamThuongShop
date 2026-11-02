@@ -99,7 +99,7 @@ export function GalleryViewer({
                   <Caption
                     locale={locale}
                     image={img}
-                    className="mt-2 text-caption"
+                    className="mt-2 text-caption text-ink"
                   />
                 </figcaption>
               </figure>

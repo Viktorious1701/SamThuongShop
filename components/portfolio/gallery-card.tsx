@@ -1,9 +1,8 @@
 // components/portfolio/gallery-card.tsx
 //
-// Story 1.6 — a gallery's cover tile on /portfolio. Whole card is one
-// locale-aware link (no hover-only affordances, EXPERIENCE.md). The cover is
-// cropped to a fixed 4:3 frame so a row of cards lines up; the full,
-// uncropped photos live inside the gallery.
+// A gallery's cover card (Home + /work). Whole card is one locale-aware link
+// (no hover-only affordances). The cover is cropped to a fixed 4:5 frame so a
+// row of cards lines up; the full, uncropped photos live inside the gallery.
 
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
@@ -22,19 +21,19 @@ export function GalleryCard({
   eager?: boolean;
 }) {
   const name = pickLocalized(locale, gallery.nameVi, gallery.nameEn);
-  const coverAlt = pickLocalized(locale, gallery.cover.speciesVi, gallery.cover.speciesEn) || name;
+  const coverAlt = pickLocalized(locale, gallery.cover.captionVi, gallery.cover.captionEn) || name;
 
   return (
     <Link
-      href={`/portfolio/${gallery.slug}`}
+      href={`/work/${gallery.slug}`}
       className="group block rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-deep focus-visible:ring-offset-4 focus-visible:ring-offset-bg-page"
     >
-      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-sm bg-surface-sunken">
+      <div className="relative aspect-[4/5] w-full overflow-hidden rounded-sm bg-surface-sunken">
         <Image
           src={gallery.cover.url}
           alt={coverAlt}
           fill
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           placeholder="blur"
           blurDataURL={gallery.cover.blurDataUrl}
           loading={eager ? "eager" : "lazy"}

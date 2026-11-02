@@ -1,10 +1,11 @@
 // lib/validation/portfolio-schemas.ts
 //
-// Story 1.6 — Zod schemas for the gallery editor and the per-image caption
-// row. Admin is outside next-intl, so messages are literal English (matches
-// product-schemas.ts / collection-schemas.ts). Content is bilingual per-locale
-// columns (AD-7); every caption field is optional — an uncaptioned image
-// falls back to the gallery name for its alt text.
+// Zod schemas for the gallery editor and the per-photo details row. Admin is
+// outside next-intl, so messages are literal English. Content is bilingual
+// per-locale columns (AD-7); every photo field is optional — an uncaptioned
+// photo falls back to the gallery name for its alt text.
+// Revamp: galleries are one level (no parent); "species" is now "caption";
+// the print link is gone.
 
 import { z } from "zod";
 
@@ -26,15 +27,7 @@ export const gallerySchema = z.object({
     .trim()
     .toLowerCase()
     .max(80, "URL name is too long.")
-    .regex(
-      /^$|^[a-z0-9]+(?:-[a-z0-9]+)*$/,
-      "URL name may only use a–z, 0–9 and single hyphens.",
-    )
-    .optional()
-    .nullable()
-    .transform((v) => (v ? v : null)),
-  parentId: z
-    .string()
+    .regex(/^$|^[a-z0-9]+(?:-[a-z0-9]+)*$/, "URL name may only use a–z, 0–9 and single hyphens.")
     .optional()
     .nullable()
     .transform((v) => (v ? v : null)),
@@ -45,16 +38,11 @@ export const gallerySchema = z.object({
 export type GalleryInput = z.infer<typeof gallerySchema>;
 
 export const imageDetailsSchema = z.object({
-  speciesVi: optionalText(200),
-  speciesEn: optionalText(200),
+  captionVi: optionalText(200),
+  captionEn: optionalText(200),
   locationVi: optionalText(200),
   locationEn: optionalText(200),
   featured: z.boolean().default(false),
-  productId: z
-    .string()
-    .optional()
-    .nullable()
-    .transform((v) => (v ? v : null)),
 });
 
 export type ImageDetailsInput = z.infer<typeof imageDetailsSchema>;

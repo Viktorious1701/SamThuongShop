@@ -11,8 +11,8 @@
 // file, which gets Retry (re-processing reuses the already-uploaded original)
 // or Remove (which discards the private original).
 //
-// Details: per-image species/location (vi+en), Featured, optional linked
-// print, ↑/↓ reorder (D7) and delete. Local state is the source of truth for
+// Details: per-photo caption + place/date (vi+en), Featured, ↑/↓ reorder
+// and delete. (Revamp: the print link is gone.) Local state is the source of truth for
 // the list so edits don't fight the server refresh.
 
 import Image from "next/image";
@@ -26,7 +26,6 @@ import {
   saveImageDetailsAction,
 } from "../actions";
 import type { AdminImage } from "@/lib/server/portfolio";
-import type { ProductOption } from "@/lib/server/product";
 
 const UPLOAD_CONCURRENCY = 3;
 const MAX_FILE_BYTES = 80 * 1024 * 1024; // 80 MB per original
@@ -67,11 +66,9 @@ const input =
 export function ImageManager({
   galleryId,
   initialImages,
-  products,
 }: {
   galleryId: string;
   initialImages: AdminImage[];
-  products: ProductOption[];
 }) {
   const [images, setImages] = useState<AdminImage[]>(initialImages);
 
@@ -290,7 +287,6 @@ export function ImageManager({
               key={img.id}
               image={img}
               galleryId={galleryId}
-              products={products}
               isFirst={i === 0}
               isLast={i === images.length - 1}
               onMove={(dir) => move(i, dir)}
@@ -309,7 +305,6 @@ export function ImageManager({
 function ImageRow({
   image,
   galleryId,
-  products,
   isFirst,
   isLast,
   onMove,
@@ -318,7 +313,6 @@ function ImageRow({
 }: {
   image: AdminImage;
   galleryId: string;
-  products: ProductOption[];
   isFirst: boolean;
   isLast: boolean;
   onMove: (dir: "up" | "down") => void;
@@ -326,23 +320,21 @@ function ImageRow({
   onSaved: (img: AdminImage) => void;
 }) {
   const [draft, setDraft] = useState({
-    speciesVi: image.speciesVi ?? "",
-    speciesEn: image.speciesEn ?? "",
+    captionVi: image.captionVi ?? "",
+    captionEn: image.captionEn ?? "",
     locationVi: image.locationVi ?? "",
     locationEn: image.locationEn ?? "",
     featured: image.featured,
-    productId: image.productId ?? "",
   });
   const [pending, start] = useTransition();
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
 
   const dirty =
-    draft.speciesVi !== (image.speciesVi ?? "") ||
-    draft.speciesEn !== (image.speciesEn ?? "") ||
+    draft.captionVi !== (image.captionVi ?? "") ||
+    draft.captionEn !== (image.captionEn ?? "") ||
     draft.locationVi !== (image.locationVi ?? "") ||
     draft.locationEn !== (image.locationEn ?? "") ||
-    draft.featured !== image.featured ||
-    draft.productId !== (image.productId ?? "");
+    draft.featured !== image.featured;
 
   const field = (name: keyof typeof draft, label: string, placeholder: string) => (
     <label className="space-y-1">
@@ -367,18 +359,17 @@ function ImageRow({
       const clean = (v: string) => v.trim() || null;
       onSaved({
         ...image,
-        speciesVi: clean(draft.speciesVi),
-        speciesEn: clean(draft.speciesEn),
+        captionVi: clean(draft.captionVi),
+        captionEn: clean(draft.captionEn),
         locationVi: clean(draft.locationVi),
         locationEn: clean(draft.locationEn),
         featured: draft.featured,
-        productId: draft.productId || null,
       });
       setMessage({ ok: true, text: "Saved." });
     });
   }
 
-  const label = image.speciesEn || image.speciesVi || "Untitled image";
+  const label = image.captionEn || image.captionVi || "Untitled photo";
 
   return (
     <li className="flex flex-col gap-4 rounded-md border border-border bg-surface p-4 md:flex-row">
@@ -398,10 +389,10 @@ function ImageRow({
 
       <div className="min-w-0 flex-1 space-y-3">
         <div className="grid gap-3 sm:grid-cols-2">
-          {field("speciesVi", "Species (Vietnamese)", "Bồng chanh đỏ")}
-          {field("speciesEn", "Species (English)", "Black-backed Kingfisher")}
-          {field("locationVi", "Location (Vietnamese)", "Vườn quốc gia Cát Tiên")}
-          {field("locationEn", "Location (English)", "Cat Tien National Park")}
+          {field("captionVi", "Caption (Vietnamese)", "Sếu đầu đỏ")}
+          {field("captionEn", "Caption (English)", "Sarus Crane")}
+          {field("locationVi", "Place & date (Vietnamese)", "Tràm Chim, 2024")}
+          {field("locationEn", "Place & date (English)", "Tram Chim, 2024")}
         </div>
 
         <div className="flex flex-wrap items-end gap-4">
@@ -415,22 +406,6 @@ function ImageRow({
             Featured
           </label>
 
-          <label className="min-w-56 flex-1 space-y-1">
-            <span className="text-caption text-ink">Linked print (optional)</span>
-            <select
-              className={input}
-              value={draft.productId}
-              onChange={(e) => setDraft({ ...draft, productId: e.target.value })}
-            >
-              <option value="">— Not for sale —</option>
-              {products.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.nameEn}
-                  {p.published ? "" : " (draft)"}
-                </option>
-              ))}
-            </select>
-          </label>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">

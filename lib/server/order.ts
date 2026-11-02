@@ -9,7 +9,7 @@ import { randomInt } from "node:crypto";
 import { prisma } from "@/lib/server/db";
 import { getVariantsByIds } from "@/lib/server/product";
 import { getStoreSettings } from "@/lib/server/settings";
-import { onlinePaymentEnabled } from "@/lib/server/shop-config";
+import { onlinePaymentEnabled, shopEnabled } from "@/lib/server/shop-config";
 import { pickLocalized } from "@/lib/format";
 import type { OrderStatus, PaymentMethod } from "@/lib/generated/prisma/enums";
 
@@ -83,6 +83,12 @@ function isUniqueConstraintError(error: unknown): boolean {
 export async function createOrder(
   input: CreateOrderInput,
 ): Promise<CreateOrderResult> {
+  // Portfolio-only revamp — the shop is switched off. The checkout page
+  // already 404s, but a Server Action can be called directly, so refuse here.
+  if (!shopEnabled()) {
+    return { ok: false, error: "shop-unavailable" };
+  }
+
   // Story 3.8 — no online provider is wired yet, so a VIETQR order could
   // never be paid. Refuse it rather than create an order stuck pending.
   if (input.paymentMethod === "VIETQR" && !onlinePaymentEnabled()) {
