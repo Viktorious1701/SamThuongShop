@@ -139,5 +139,22 @@
     "orderNotFoundTitle": "Order not found",
     "orderNotFoundBody": "This order reference doesn't match anything, or the link is out of date.",
     "backToShop": "Back to Shop"
+  },
+  "Portfolio": {
+    "title": "Portfolio",
+    "intro": "Birds of Vietnam and beyond — wetlands, forests and coasts, photographed patiently in the field by Sâm Thương.",
+    "empty": "New galleries are on their way. Please check back soon.",
+    "viewAll": "View all",
+    "imageCount": "{count, plural, one {# photo} other {# photos}}",
+    "otherGalleries": "More galleries",
+    "backToPortfolio": "Back to portfolio",
+    "openImage": "Open {name}",
+    "untitled": "Photograph",
+    "lightboxLabel": "Photo viewer",
+    "close": "Close",
+    "previous": "Previous photo",
+    "next": "Next photo",
+    "imageOf": "{current} of {total}",
+    "viewPrint": "View this print"
   }
 }

@@ -115,12 +115,15 @@ export async function getObject(input: {
   return Buffer.from(bytes);
 }
 
-/** Server-side upload — used by the seed (small placeholder files only). */
+/** Server-side upload — used by the seed, watermarked previews (2.2) and
+ * portfolio display copies (1.6). */
 export async function putObject(input: {
   scope: StorageScope;
   key: string;
   body: Buffer | Uint8Array;
   contentType: string;
+  /** e.g. immutable caching for content-addressed (random-key) images. */
+  cacheControl?: string;
 }): Promise<void> {
   await client().send(
     new PutObjectCommand({
@@ -128,6 +131,7 @@ export async function putObject(input: {
       Key: input.key,
       Body: input.body,
       ContentType: input.contentType,
+      CacheControl: input.cacheControl,
     }),
   );
 }

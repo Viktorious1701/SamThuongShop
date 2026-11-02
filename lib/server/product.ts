@@ -225,7 +225,9 @@ export async function getProduct(id: string): Promise<ProductDTO | null> {
 // Story 3.8 — while digital sales are off, Digital Download variants are
 // invisible to every storefront, cart and order read. Filtering here (the
 // only variant reads those paths use) means no caller needs its own check.
-function sellableVariantWhere(): { format?: "PRINT" } {
+// Exported for Story 1.6 — a portfolio image's "View this print" link only
+// shows when its Product is published AND has a sellable variant.
+export function sellableVariantWhere(): { format?: "PRINT" } {
   return digitalSalesEnabled() ? {} : { format: "PRINT" };
 }
 
@@ -453,4 +455,23 @@ async function cleanupObjects(
     ...publicKeys.map((key) => deleteObject({ scope: "public", key })),
     ...privateKeys.map((key) => deleteObject({ scope: "private", key })),
   ]);
+}
+
+// --- Story 1.6 — portfolio → product link ---------------------------------
+
+export type ProductOption = {
+  id: string;
+  nameEn: string;
+  nameVi: string;
+  published: boolean;
+};
+
+/** Every product (published or not) for the admin "Link to print" dropdown —
+ * an image can be linked ahead of publishing; the public link only appears
+ * once the product is published and sellable (sellableVariantWhere). */
+export async function listProductOptions(): Promise<ProductOption[]> {
+  return prisma.product.findMany({
+    orderBy: { nameEn: "asc" },
+    select: { id: true, nameEn: true, nameVi: true, published: true },
+  });
 }

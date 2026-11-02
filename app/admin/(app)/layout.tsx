@@ -15,9 +15,10 @@ import { LogoutButton } from "@/components/logout-button";
 // screens land in later epics/stories. They're rendered as inert labels
 // (not links) so there's nothing 404-ing behind them yet.
 
-// Products (2.1), Collections + Settings (2.3), Orders (3.4/4.1) are live;
+// Portfolio (1.6), Products (2.1), Collections + Settings (2.3), Orders
+// (3.4/4.1) are live;
 // the rest arrive in later epics/stories.
-const PLACEHOLDER_NAV = ["Portfolio", "About"];
+const PLACEHOLDER_NAV = ["About"];
 
 export default async function AdminAppLayout({
   children,
@@ -39,6 +40,13 @@ export default async function AdminAppLayout({
             className="rounded-md px-3 py-2 text-caption text-ink transition-colors hover:bg-surface-sunken"
           >
             Dashboard
+          </Link>
+
+          <Link
+            href="/admin/galleries"
+            className="rounded-md px-3 py-2 text-caption text-ink transition-colors hover:bg-surface-sunken"
+          >
+            Portfolio
           </Link>
 
           <Link

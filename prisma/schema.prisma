@@ -54,9 +54,10 @@ model Product {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  variants    ProductVariant[]
-  images      ProductImage[]
-  collections Collection[] // Story 2.3 — many-to-many
+  variants        ProductVariant[]
+  images          ProductImage[]
+  collections     Collection[] // Story 2.3 — many-to-many
+  portfolioImages PortfolioImage[] // Story 1.6 — portfolio images linking to this print
 }
 
 // A specific purchasable form of a Product with its own integer-VND price.
@@ -209,4 +210,69 @@ model OrderLine {
   lineTotalVnd Int
 
   @@index([orderId])
+}
+
+// --- Epic 1, Story 1.6 — Portfolio galleries -----------------------------
+// The portfolio is the site's lead surface (portfolio-first pivot). Two
+// levels only: a Gallery with children is a GROUP (e.g. "Chim Việt Nam");
+// a Gallery without children holds images (e.g. "Tràm Chim"). Depth ≤ 1 and
+// "images only in leaf galleries" are enforced in lib/server/portfolio.ts.
+// Bilingual content per-locale on the row (AD-7).
+model Gallery {
+  id            String   @id @default(cuid())
+  slug          String   @unique // public URL key: /portfolio/{slug}
+  nameVi        String
+  nameEn        String
+  descriptionVi String?
+  descriptionEn String?
+  position      Int      @default(0) // order among its siblings
+  published     Boolean  @default(false) // build quietly, publish when ready
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Restrict: a group can't be deleted while it still has child galleries.
+  parentId String?
+  parent   Gallery?  @relation("GalleryTree", fields: [parentId], references: [id], onDelete: Restrict)
+  children Gallery[] @relation("GalleryTree")
+
+  images PortfolioImage[]
+
+  @@index([parentId])
+}
+
+// One portfolio photograph. `key` is the RESIZED display copy in the PUBLIC
+// bucket (≤2400px, metadata stripped, never watermarked); `originalKey` is
+// the full-resolution upload kept in the PRIVATE bucket as the archive and
+// never served (AD-15). width/height reserve the aspect ratio (no layout
+// shift); blurDataUrl is a tiny inline placeholder.
+model PortfolioImage {
+  id        String  @id @default(cuid())
+  // Restrict: a gallery can't be deleted while it still holds images.
+  galleryId String
+  gallery   Gallery @relation(fields: [galleryId], references: [id], onDelete: Restrict)
+
+  key         String
+  originalKey String
+  width       Int
+  height      Int
+  blurDataUrl String
+
+  speciesVi  String?
+  speciesEn  String?
+  locationVi String?
+  locationEn String?
+
+  position Int     @default(0)
+  featured Boolean @default(false) // read by Home (Story 1.10)
+
+  // Optional link to the print for sale. Soft: deleting the Product just
+  // unlinks the image.
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@index([galleryId])
+  @@index([featured])
+  @@index([productId])
 }

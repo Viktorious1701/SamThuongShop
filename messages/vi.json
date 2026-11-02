@@ -139,5 +139,22 @@
     "orderNotFoundTitle": "Không tìm thấy đơn hàng",
     "orderNotFoundBody": "Mã đơn hàng này không khớp, hoặc liên kết đã cũ.",
     "backToShop": "Về Cửa hàng"
+  },
+  "Portfolio": {
+    "title": "Bộ sưu tập",
+    "intro": "Chim Việt Nam và thế giới — đất ngập nước, rừng và bờ biển, được Sâm Thương kiên nhẫn ghi lại ngoài thực địa.",
+    "empty": "Các bộ ảnh mới đang được chuẩn bị. Mời bạn quay lại sau.",
+    "viewAll": "Xem tất cả",
+    "imageCount": "{count} ảnh",
+    "otherGalleries": "Bộ ảnh khác",
+    "backToPortfolio": "Quay lại bộ sưu tập",
+    "openImage": "Mở ảnh {name}",
+    "untitled": "Ảnh",
+    "lightboxLabel": "Trình xem ảnh",
+    "close": "Đóng",
+    "previous": "Ảnh trước",
+    "next": "Ảnh tiếp theo",
+    "imageOf": "{current} / {total}",
+    "viewPrint": "Xem bản in này"
   }
 }
