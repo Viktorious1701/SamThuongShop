@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireOperator } from "@/lib/server/require-operator";
 import { getProduct } from "@/lib/server/product";
+import { digitalSalesEnabled } from "@/lib/server/shop-config";
 import { ProductEditor } from "../../product-editor";
 
 export default async function EditProductPage({
@@ -27,7 +28,11 @@ export default async function EditProductPage({
         </Link>
         <h1 className="text-h2 text-ink">Edit product</h1>
       </div>
-      <ProductEditor initial={product} productId={product.id} />
+      <ProductEditor
+        initial={product}
+        productId={product.id}
+        digitalSalesOn={digitalSalesEnabled()}
+      />
     </div>
   );
 }

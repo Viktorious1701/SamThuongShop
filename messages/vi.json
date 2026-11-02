@@ -131,6 +131,7 @@
     "methodVietqr": "Chuyển khoản / VietQR",
     "methodVietqrHint": "Thanh toán trực tuyến sẽ có sớm — đơn hàng của bạn vẫn được lưu.",
     "codUnavailableDigital": "Không áp dụng thanh toán khi nhận hàng cho bản số.",
+    "codOnlyNote": "Hiện tại chỉ nhận thanh toán khi nhận hàng (COD).",
     "codPlacedTitle": "Đã đặt hàng — thanh toán khi nhận",
     "codPlacedBody": "Chúng tôi sẽ chuẩn bị bản in và bạn trả tiền mặt khi nhận hàng. Hãy lưu mã đơn hàng để theo dõi.",
     "paymentNextTitle": "Tiếp theo: thanh toán",

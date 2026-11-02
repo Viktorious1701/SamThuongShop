@@ -4,6 +4,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import { resolveCart } from "@/lib/server/cart";
 import { getStoreSettings } from "@/lib/server/settings";
+import { onlinePaymentEnabled } from "@/lib/server/shop-config";
 import { formatVnd } from "@/lib/format";
 import { CheckoutForm } from "./checkout-form";
 
@@ -53,6 +54,7 @@ export default async function CheckoutPage() {
             signedIn={!!session?.user}
             canCod={canCod}
             hasDigital={hasDigital}
+            onlinePayment={onlinePaymentEnabled()}
           />
         </div>
 

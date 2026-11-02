@@ -11,6 +11,7 @@ import { auth } from "@/auth";
 import { getCartItems, clearCart } from "@/lib/server/cart";
 import { getVariantsByIds } from "@/lib/server/product";
 import { createOrder } from "@/lib/server/order";
+import { onlinePaymentEnabled } from "@/lib/server/shop-config";
 import { checkoutSchema, SHIP_FIELDS } from "@/lib/validation/checkout-schemas";
 
 export type CheckoutState = {
@@ -34,10 +35,14 @@ export async function placeOrder(
   const hasPhysical = variants.some((v) => v.format === "PRINT");
 
   // Payment method — server truth. COD is only valid on a prints-only cart
-  // (AD-8); anything else falls back to VIETQR. createOrder re-guards too.
+  // (AD-8); anything else falls back to VIETQR. While online payment is off
+  // (Story 3.8) COD is the only method, whatever the form posted — digital
+  // variants are filtered out upstream, so the cart is prints-only.
+  // createOrder re-guards both rules.
   const canCod = hasPhysical && !variants.some((v) => v.format === "DIGITAL");
   const paymentMethod =
-    String(formData.get("paymentMethod") ?? "") === "COD" && canCod
+    !onlinePaymentEnabled() ||
+    (String(formData.get("paymentMethod") ?? "") === "COD" && canCod)
       ? "COD"
       : "VIETQR";
 

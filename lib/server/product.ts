@@ -8,6 +8,7 @@
 
 import { prisma } from "@/lib/server/db";
 import { deleteObject, publicUrl } from "@/lib/server/storage";
+import { digitalSalesEnabled } from "@/lib/server/shop-config";
 import type { ProductInput } from "@/lib/validation/product-schemas";
 
 export type ProductImageDTO = {
@@ -221,13 +222,23 @@ export async function getProduct(id: string): Promise<ProductDTO | null> {
 
 // --- storefront reads (published-only, client-safe) -----------------------
 
+// Story 3.8 — while digital sales are off, Digital Download variants are
+// invisible to every storefront, cart and order read. Filtering here (the
+// only variant reads those paths use) means no caller needs its own check.
+function sellableVariantWhere(): { format?: "PRINT" } {
+  return digitalSalesEnabled() ? {} : { format: "PRINT" };
+}
+
 export async function listPublishedProducts(): Promise<StorefrontCard[]> {
   const rows = await prisma.product.findMany({
     where: { published: true },
     orderBy: { createdAt: "desc" },
     include: {
       images: { orderBy: { position: "asc" }, take: 1 },
-      variants: { select: { format: true, priceVnd: true } },
+      variants: {
+        where: sellableVariantWhere(),
+        select: { format: true, priceVnd: true },
+      },
     },
   });
 
@@ -250,10 +261,15 @@ export async function getPublishedProductBySlug(
     where: { slug },
     include: {
       images: { orderBy: { position: "asc" } },
-      variants: { orderBy: { position: "asc" } },
+      variants: {
+        where: sellableVariantWhere(),
+        orderBy: { position: "asc" },
+      },
     },
   });
-  if (!p || !p.published) return null;
+  // No sellable variant left (e.g. a digital-only product while digital
+  // sales are off) → the page shows its calm "unavailable" state.
+  if (!p || !p.published || p.variants.length === 0) return null;
 
   // Map to the client-safe shape ONLY — no originalKey/filename/contentType.
   return {
@@ -279,13 +295,18 @@ export async function getPublishedProductBySlug(
 
 /**
  * Server-authoritative variant read for the cart: returns only variants of
- * PUBLISHED products (unpublished/missing ids are dropped) with the data a
+ * PUBLISHED products (unpublished/missing ids are dropped — as are digital
+ * variants while digital sales are off, Story 3.8) with the data a
  * cart line needs — price/format come from the DB, never the client (AD-10).
  */
 export async function getVariantsByIds(ids: string[]): Promise<CartVariant[]> {
   if (ids.length === 0) return [];
   const rows = await prisma.productVariant.findMany({
-    where: { id: { in: ids }, product: { published: true } },
+    where: {
+      id: { in: ids },
+      product: { published: true },
+      ...sellableVariantWhere(),
+    },
     include: {
       product: {
         select: {

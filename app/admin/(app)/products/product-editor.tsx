@@ -81,9 +81,12 @@ async function uploadToR2(
 export function ProductEditor({
   initial,
   productId,
+  digitalSalesOn,
 }: {
   initial?: ProductDTO;
   productId?: string;
+  /** Story 3.8 — when false, digital variants are hidden from the shop. */
+  digitalSalesOn: boolean;
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -361,6 +364,12 @@ export function ProductEditor({
 
               {v.format === "DIGITAL" ? (
                 <div className="space-y-1">
+                  {digitalSalesOn ? null : (
+                    <p className="text-caption text-pending">
+                      Digital sales are off — this variant is saved but hidden
+                      from the shop until digital delivery ships.
+                    </p>
+                  )}
                   <span className="text-caption text-ink">
                     Digital original (private)
                   </span>

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { requireOperator } from "@/lib/server/require-operator";
+import { digitalSalesEnabled } from "@/lib/server/shop-config";
 import { ProductEditor } from "../product-editor";
 
 export default async function NewProductPage() {
@@ -18,7 +19,7 @@ export default async function NewProductPage() {
         </Link>
         <h1 className="text-h2 text-ink">New product</h1>
       </div>
-      <ProductEditor />
+      <ProductEditor digitalSalesOn={digitalSalesEnabled()} />
     </div>
   );
 }

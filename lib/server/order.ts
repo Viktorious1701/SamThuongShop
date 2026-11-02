@@ -9,6 +9,7 @@ import { randomInt } from "node:crypto";
 import { prisma } from "@/lib/server/db";
 import { getVariantsByIds } from "@/lib/server/product";
 import { getStoreSettings } from "@/lib/server/settings";
+import { onlinePaymentEnabled } from "@/lib/server/shop-config";
 import { pickLocalized } from "@/lib/format";
 import type { OrderStatus, PaymentMethod } from "@/lib/generated/prisma/enums";
 
@@ -82,6 +83,12 @@ function isUniqueConstraintError(error: unknown): boolean {
 export async function createOrder(
   input: CreateOrderInput,
 ): Promise<CreateOrderResult> {
+  // Story 3.8 — no online provider is wired yet, so a VIETQR order could
+  // never be paid. Refuse it rather than create an order stuck pending.
+  if (input.paymentMethod === "VIETQR" && !onlinePaymentEnabled()) {
+    return { ok: false, error: "payment-unavailable" };
+  }
+
   // Recompute from the DB (AD-10) — published-only; dropped ids simply fall out.
   const variants = await getVariantsByIds(input.items.map((i) => i.variantId));
   const byId = new Map(variants.map((v) => [v.id, v]));

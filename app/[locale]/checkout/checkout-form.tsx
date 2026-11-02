@@ -19,11 +19,14 @@ export function CheckoutForm({
   signedIn,
   canCod,
   hasDigital,
+  onlinePayment,
 }: {
   hasPhysical: boolean;
   signedIn: boolean;
   canCod: boolean;
   hasDigital: boolean;
+  /** Story 3.8 — VietQR is offered only once online payment is enabled. */
+  onlinePayment: boolean;
 }) {
   const t = useTranslations("Checkout");
   const [state, formAction] = useActionState(placeOrder, initialState);
@@ -63,21 +66,25 @@ export function CheckoutForm({
             </span>
           </label>
         ) : null}
-        <label className="flex items-start gap-3 rounded-md border border-border p-3 has-[:checked]:border-sky-deep">
-          <input
-            type="radio"
-            name="paymentMethod"
-            value="VIETQR"
-            defaultChecked={!canCod}
-            className="mt-1"
-          />
-          <span>
-            <span className="block text-body text-ink">{t("methodVietqr")}</span>
-            <span className="block text-caption text-ink-muted">
-              {t("methodVietqrHint")}
+        {onlinePayment ? (
+          <label className="flex items-start gap-3 rounded-md border border-border p-3 has-[:checked]:border-sky-deep">
+            <input
+              type="radio"
+              name="paymentMethod"
+              value="VIETQR"
+              defaultChecked={!canCod}
+              className="mt-1"
+            />
+            <span>
+              <span className="block text-body text-ink">{t("methodVietqr")}</span>
+              <span className="block text-caption text-ink-muted">
+                {t("methodVietqrHint")}
+              </span>
             </span>
-          </span>
-        </label>
+          </label>
+        ) : (
+          <p className="text-caption text-ink-muted">{t("codOnlyNote")}</p>
+        )}
         {hasDigital ? (
           <p className="text-caption text-ink-muted">
             {t("codUnavailableDigital")}
