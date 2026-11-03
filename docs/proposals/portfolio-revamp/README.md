@@ -6,7 +6,7 @@
 
 The site grew features nobody asked to use day to day: a shop, cart, checkout, customer accounts, orders, collections, an Achievements system, two-level gallery groups and print links. The owner said it plainly: *"there are so many functions … that even I don't know how it works."*
 
-The photos also show the work is **not only birds**. There is sport and press (Asian Games 2026), landscape (aerial fields) and performance (dance portrait). So the site should be:
+The photos also show the work is **not only birds**. There is landscape (aerial fields) and performance (dance portrait) as well. So the site should be:
 
 > **A portfolio of Sâm Thương's photographs. Nothing else on the public site.**
 
@@ -111,7 +111,6 @@ All pages share `SiteHeader`, `<main>` and `SiteFooter`.
 2. **URLs `/work`** (as in the prototype) or keep `/portfolio`? *Recommended: `/work`, which is shorter and suits more than birds.*
 3. **Gallery list:** Birds · Sport & Events · Landscapes · People & Performance. Is that right? Are there others (Travel? Wildlife other than birds?)
 4. **Captions:** the placeholders in the prototype are guesses. Species, places and dates need the photographer's input.
-5. **Photo quality:** the Asian Games photo is only 620 × 349 px. Is there a larger original?
 
 ## 8. Build plan (after approval)
 
