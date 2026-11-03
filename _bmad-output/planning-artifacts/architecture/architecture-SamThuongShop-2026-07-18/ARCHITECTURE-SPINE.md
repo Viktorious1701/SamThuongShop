@@ -4,11 +4,11 @@ type: architecture-spine
 purpose: build-substrate
 altitude: initiative
 paradigm: 'Layered modular monolith on Next.js App Router (server-component-first)'
-scope: 'Whole system — bilingual storefront + portfolio, checkout (physical + digital), orders & fulfillment, digital delivery, single-operator admin'
+scope: 'Whole system — portfolio-first bilingual showcase (galleries, achievements, about) with a secondary storefront, checkout (physical + digital), orders & fulfillment, digital delivery, single-operator admin'
 status: final
 created: '2026-07-18'
-updated: '2026-07-18'
-binds: [FR-1..FR-25]
+updated: '2026-10-29'
+binds: [FR-1..FR-27]
 sources:
   - ../../prds/prd-SamThuongShop-2026-07-18/prd.md
   - ../../ux-designs/ux-SamThuongShop-2026-07-18/DESIGN.md
@@ -20,7 +20,7 @@ companions: []
 
 ## Design Paradigm
 
-**Layered modular monolith** on **Next.js 16 App Router**, server-component-first. One codebase holds the bilingual storefront, the portfolio, and the operator admin. Three layers, dependencies point inward only:
+**Layered modular monolith** on **Next.js 16 App Router**, server-component-first. One codebase holds the bilingual portfolio showcase (primary), the storefront (secondary), and the operator admin. *(Portfolio-first since 2026-10-29 — see `sprint-change-proposal-2026-10-29.md`.)* Three layers, dependencies point inward only:
 
 - **Presentation** — `app/` routes + `components/`. React Server Components by default; client components only for interaction. Never touches the database.
 - **Application/domain** — `lib/server/` service modules. Owns all business logic and the only Prisma access. Invoked from the presentation layer through **Server Actions** (mutations) and read functions.
@@ -79,7 +79,7 @@ graph TD
 ### AD-7 — Bilingual content model, Vietnamese-fallback, VND-only
 - **Binds:** FR-25, FR-19, FR-22 (i18n, product/portfolio content)
 - **Prevents:** single-language schema; translation drift; a stray currency dimension
-- **Rule:** translatable fields on Product / Portfolio / About are stored **per-locale (`vi`, `en`)**; missing translations fall back to `vi`. UI strings use **next-intl** with **locale-prefixed routes** (`/vi/…`, `/en/…`, `vi` default); page metadata / OpenGraph follow the active locale. Prices carry no currency dimension — always VND (AD-5).
+- **Rule:** translatable fields on Product / Gallery / PortfolioImage / Achievement / About are stored **per-locale (`vi`, `en`)**; missing translations fall back to `vi`. UI strings use **next-intl** with **locale-prefixed routes** (`/vi/…`, `/en/…`, `vi` default); page metadata / OpenGraph follow the active locale. Prices carry no currency dimension — always VND (AD-5).
 
 ### AD-8 — Variant format drives fulfillment
 - **Binds:** FR-2, FR-4, FR-6, FR-8, FR-11
@@ -119,13 +119,13 @@ graph TD
 ### AD-15 — Two-tier asset storage, non-derivable keys
 - **Binds:** FR-2, FR-6, FR-13, SM-C2 (media, previews, downloads)
 - **Prevents:** an upload unit and a storefront unit disagreeing on where originals vs previews live; a preview key that reveals the original
-- **Rule:** **private R2** holds original download files (served only via AD-6/AD-14); public display/preview assets (product/gallery images, watermarked previews) are served for viewing. Every stored object key is **non-derivable** (random) and **owned by its DB record** (Variant/ProductImage) — one unit never guesses another's path.
+- **Rule:** **private R2** holds original download files (served only via AD-6/AD-14); public display/preview assets (product, gallery and achievement images, watermarked previews) are served for viewing. Every stored object key is **non-derivable** (random) and **owned by its DB record** (Variant/ProductImage) — one unit never guesses another's path.
 
 ## Consistency Conventions
 
 | Concern | Convention |
 | --- | --- |
-| Entity naming | PascalCase domain nouns matching the PRD Glossary: `Product`, `Variant`, `Collection`, `Order`, `OrderLine`, `Customer`, `Payment`, `DownloadGrant`, `PortfolioImage`, `Gallery`. |
+| Entity naming | PascalCase domain nouns matching the PRD Glossary: `Product`, `Variant`, `Collection`, `Order`, `OrderLine`, `Customer`, `Payment`, `DownloadGrant`, `PortfolioImage`, `Gallery`, `Achievement`. |
 | Files / routes | kebab-case files; localized routes under `app/[locale]/`; admin under `app/admin/`; inbound handlers under `app/api/`. |
 | IDs & references | DB keys `cuid()`; human-facing Order reference a short uppercase code (used for guest lookup, FR-10). |
 | Money & dates | integer VND (AD-5); timestamps stored UTC ISO-8601, formatted per locale at the edge. |
@@ -184,8 +184,12 @@ erDiagram
   Order ||--o{ DownloadGrant : grants
   DownloadGrant }o--|| Variant : "for"
   Gallery ||--o{ PortfolioImage : shows
+  Gallery |o--o{ Gallery : "groups (one level)"
   PortfolioImage }o--o| Product : "may link"
+  Achievement }o--o| PortfolioImage : "may show"
 ```
+
+`Achievement.kind` ∈ {AWARD, EXHIBITION, PUBLICATION, HONOUR}. A Gallery may have one parent Gallery (grouping only, max depth 2). `Gallery`, `PortfolioImage` and `Achievement` are owned by a `lib/server/portfolio` service (AD-2).
 
 **Source tree (cold-start scaffold — code owns the detail)**
 
@@ -194,12 +198,12 @@ samthuongshop/
   app/
     [locale]/              # localized public site (next-intl)
       (shop)/              # catalog, collection, product, cart, checkout, order
-      (portfolio)/         # galleries, about, contact
+      (portfolio)/         # galleries, achievements, about, contact (primary)
       (account)/           # login, order history, re-download
     admin/                 # operator-only (AD-9): products, orders, portfolio
     api/                   # Route Handlers: payos-webhook, download, auth
   lib/server/              # domain services (only Prisma access) + adapters:
-                           #   order, product, payment(payOS), storage(R2), email(Resend), auth
+                           #   portfolio, order, product, payment(payOS), storage(R2), email(Resend), auth
   components/              # RSC + client UI (DESIGN.md tokens)
   messages/                # vi.json, en.json
   prisma/                  # schema, migrations
@@ -209,13 +213,13 @@ samthuongshop/
 
 | Capability / Area | Lives in | Governed by |
 | --- | --- | --- |
+| Portfolio, achievements & about (FR-16..FR-18, FR-26, FR-27) — primary | `app/[locale]/(portfolio)`, home, `lib/server/portfolio` | AD-2, AD-7, AD-15 |
 | Catalog & storefront (FR-1..FR-3) | `app/[locale]/(shop)`, `lib/server/product` | AD-2, AD-7, AD-8, AD-15 |
 | Cart & checkout (FR-4..FR-7) | `(shop)` checkout, `lib/server/order` | AD-3, AD-5, AD-8, AD-10, AD-11 |
 | Payments (FR-8, FR-9) | `lib/server/payment`, `api/payos-webhook` | AD-4, AD-5, AD-10, AD-13 |
 | Orders & fulfillment (FR-10..FR-12) | `lib/server/order`, admin | AD-3, AD-8, AD-11, AD-12, AD-13 |
 | Digital delivery & licensing (FR-13..FR-15) | `api/download`, `lib/server/storage` | AD-6, AD-12, AD-14, AD-15 |
-| Portfolio & about (FR-16..FR-18) | `app/[locale]/(portfolio)` | AD-2, AD-7, AD-15 |
-| Operator admin (FR-19..FR-23) | `app/admin`, domain services | AD-9, AD-2 |
+| Operator admin (FR-19..FR-23, incl. Achievements via FR-22) | `app/admin`, domain services | AD-9, AD-2 |
 | Accounts & auth (FR-24, FR-25) | `(account)`, `lib/server/auth` | AD-9, AD-7 |
 
 ## Deferred
@@ -227,4 +231,5 @@ samthuongshop/
 - **Observability & rate limiting** — Vercel/Supabase defaults for v1; dedicated logging/metrics and rate limits deferred until traffic warrants.
 - **CI/CD & backups** — Vercel Git deploys + Supabase automatic backups for v1; a formal pipeline is deferred.
 - **Operator bootstrap & seed** — the single Operator account is created via a Prisma seed/migration script (no self-serve operator signup, AD-9); broader seed/reference data deferred to build time.
+- **Shop online payment + digital sales** — switched off behind a server-side config flag (Story 3.8) until payOS (R-1) and digital delivery ship; no AD change — AD-4/AD-6 remain the rules when it is switched on.
 - **Download expiry/count policy** — the concrete expiry window and re-download count for AD-14 grants await PRD Open Q5.

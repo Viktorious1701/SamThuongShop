@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Birds — Sâm Thương</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="wordmark" href="index.html">Sâm Thương</a>
+      <nav class="site-nav" aria-label="Primary">
+        <ul>
+          <li><a href="work.html" aria-current="page">Work</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="about.html#contact">Contact</a></li>
+        </ul>
+      </nav>
+      <span class="lang" aria-label="Language"><b>EN</b> | VN</span>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap">
+      <header class="page-head">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="work.html">Work</a> / <span aria-current="page">Birds</span></nav>
+        <h1>Birds</h1>
+        <p>Optional one-paragraph introduction to this gallery, written in both languages.</p>
+      </header>
+      <p class="proto-note">/work/[slug] — &lt;PageHead&gt; + &lt;PhotoGrid&gt; (masonry, natural shapes, captions under each photo) + &lt;Lightbox&gt; + &lt;GalleryPager&gt;.</p>
+      <ul class="photo-grid">
+        <li>
+          <figure>
+            <button class="photo-tile" type="button" data-photo="../../../image_assets/portfolio/856498917_955713287187014_1468640406051171188_n.jpg"
+                    data-caption="Sarus Crane · Sếu đầu đỏ&lt;small&gt;Location TBC&lt;/small&gt;" aria-label="Open photo: Sarus Crane · Sếu đầu đỏ">
+              <img src="../../../image_assets/portfolio/856498917_955713287187014_1468640406051171188_n.jpg" alt="Sarus Crane · Sếu đầu đỏ — Location TBC" width="2048" height="1365" loading="lazy">
+            </button>
+            <figcaption class="photo-caption">Sarus Crane · Sếu đầu đỏ<small>Location TBC</small></figcaption>
+          </figure>
+        </li>
+        <li>
+          <figure>
+            <button class="photo-tile" type="button" data-photo="../../../image_assets/portfolio/861232933_3311174955741089_1849411875711851012_n.jpg"
+                    data-caption="Chestnut-breasted Coronet&lt;small&gt;Location TBC&lt;/small&gt;" aria-label="Open photo: Chestnut-breasted Coronet">
+              <img src="../../../image_assets/portfolio/861232933_3311174955741089_1849411875711851012_n.jpg" alt="Chestnut-breasted Coronet — Location TBC" width="1321" height="1849" loading="lazy">
+            </button>
+            <figcaption class="photo-caption">Chestnut-breasted Coronet<small>Location TBC</small></figcaption>
+          </figure>
+        </li>
+        <li>
+          <figure>
+            <button class="photo-tile" type="button" data-photo="../../../image_assets/portfolio/864360622_2383089595766679_6225885480545732255_n.jpg"
+                    data-caption="Shining Sunbeam&lt;small&gt;Location TBC&lt;/small&gt;" aria-label="Open photo: Shining Sunbeam">
+              <img src="../../../image_assets/portfolio/864360622_2383089595766679_6225885480545732255_n.jpg" alt="Shining Sunbeam — Location TBC" width="960" height="1344" loading="lazy">
+            </button>
+            <figcaption class="photo-caption">Shining Sunbeam<small>Location TBC</small></figcaption>
+          </figure>
+        </li>
+        <li>
+          <figure>
+            <button class="photo-tile" type="button" data-photo="../../../image_assets/portfolio/833882611_998611135971592_4969161989027391420_n.jpg"
+                    data-caption="House Crow · Quạ nhà&lt;small&gt;Location TBC&lt;/small&gt;" aria-label="Open photo: House Crow · Quạ nhà">
+              <img src="../../../image_assets/portfolio/833882611_998611135971592_4969161989027391420_n.jpg" alt="House Crow · Quạ nhà — Location TBC" width="2048" height="1365" loading="lazy">
+            </button>
+            <figcaption class="photo-caption">House Crow · Quạ nhà<small>Location TBC</small></figcaption>
+          </figure>
+        </li>
+        <li>
+          <figure>
+            <button class="photo-tile" type="button" data-photo="../../../image_assets/portfolio/862764608_1118231621130898_3193792342461519000_n.jpg"
+                    data-caption="Hummingbirds at verbena&lt;small&gt;Location TBC&lt;/small&gt;" aria-label="Open photo: Hummingbirds at verbena">
+              <img src="../../../image_assets/portfolio/862764608_1118231621130898_3193792342461519000_n.jpg" alt="Hummingbirds at verbena — Location TBC" width="2048" height="1366" loading="lazy">
+            </button>
+            <figcaption class="photo-caption">Hummingbirds at verbena<small>Location TBC</small></figcaption>
+          </figure>
+        </li>
+      </ul>
+
+      <!-- Prev / next gallery, so visitors keep browsing -->
+      <nav class="pager" aria-label="More galleries">
+        <span></span>
+        <a href="#">Sport &amp; Events →</a>
+      </nav>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <span>© 2026 Sâm Thương Photography</span>
+      <span><a href="work.html">Work</a> · <a href="about.html">About</a> · <a href="about.html#contact">Contact</a></span>
+    </div>
+  </footer>
+  <!-- Lightbox (one per page; opened by any .photo-tile) -->
+  <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer" hidden>
+    <div class="lightbox__bar">
+      <span data-counter aria-live="polite"></span>
+      <button class="icon-btn lightbox__close" type="button" aria-label="Close">✕</button>
+    </div>
+    <div class="lightbox__stage">
+      <img alt="">
+      <button class="icon-btn lightbox__prev" type="button" aria-label="Previous photo">‹</button>
+      <button class="icon-btn lightbox__next" type="button" aria-label="Next photo">›</button>
+    </div>
+    <p class="lightbox__caption"></p>
+  </div>
+  <script src="lightbox.js"></script>
+</body>
+</html>

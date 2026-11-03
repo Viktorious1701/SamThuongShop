@@ -2,7 +2,8 @@
 title: SamThuongShop
 status: final
 created: 2026-07-18
-updated: 2026-07-18
+updated: 2026-10-29
+revision: portfolio-first pivot (sprint-change-proposal-2026-10-29)
 ---
 
 # PRD: SamThuongShop
@@ -10,24 +11,30 @@ updated: 2026-07-18
 
 ## 0. Document Purpose
 
-This PRD defines **SamThuongShop**, an online store and portfolio built for **Sam Thuong**, a professional birder, and operated by a single manager (Thinh An). It is written for the downstream UX and architecture workflows and for the operator as the product owner. It is organized as: a Glossary that fixes vocabulary, Features grouped with globally-numbered Functional Requirements (FR-N) nested under each, cross-cutting non-functional requirements in their own section, and every inferred decision tagged inline as `[ASSUMPTION: ...]` and collected in the Assumptions Index (§9). It captures *capabilities*, not implementation — the tech stack, hosting, and specific providers are decided in the architecture phase, not here. Scope is deliberately lean: a standard e-commerce store plus a portfolio, kept simple because one person runs it.
+This PRD defines **SamThuongShop**, a portfolio and achievements showcase for **Sam Thuong**, a professional birder, with an optional print shop, operated by a single manager (Thinh An). It is written for the downstream UX and architecture workflows and for the operator as the product owner. It is organized as: a Glossary that fixes vocabulary, Features grouped with globally-numbered Functional Requirements (FR-N) nested under each, cross-cutting non-functional requirements in their own section, and every inferred decision tagged inline as `[ASSUMPTION: ...]` and collected in the Assumptions Index (§9). It captures *capabilities*, not implementation — the tech stack, hosting, and specific providers are decided in the architecture phase, not here. Scope is deliberately lean: a portfolio-first site with a small, secondary shop, kept simple because one person runs it.
 
 ## 1. Vision
 
-SamThuongShop is a small, image-forward online store where bird lovers can buy Sam Thuong's bird imprint pictures — either as **physical prints** shipped to their door or as **digital downloads** delivered instantly. The same site doubles as Sam Thuong's **portfolio**: a place that presents him as a serious, professional birder through curated galleries of his work and a short profile, so visitors who arrive to browse his photography can leave as customers, followers, or contacts.
+SamThuongShop is the online home of **Sam Thuong's bird photography**. It is a calm, image-forward **portfolio** that presents him as a serious, professional birder through curated **Galleries**, a record of his **Achievements** (awards and competitions, exhibitions, publications and press, honours and memberships) and a short profile. Visitors, whether fellow bird lovers, potential collaborators, editors or organisers, should arrive, be pulled straight into the pictures, and leave understanding the quality and standing of his work.
 
-It exists because Sam Thuong's photography currently has no dedicated home to be *shown* and *sold* together. A generic marketplace listing sells prints but tells no story; a portfolio site tells the story but takes no money. SamThuongShop does both in one place, tuned for the Vietnamese market (VND, familiar local payment methods, domestic delivery), and simple enough that one operator can run the whole thing — add products, take orders, and ship — without a team.
+Selling is **secondary**. An optional **Shop** lets visitors who fall for an image buy it as a **Physical Print** (wall / wood-print décor, the primary product), with **Digital Downloads** as a minor add-on. The shop is one quiet path out of the portfolio, never the headline.
 
-Success looks like: a live catalog fellow bird lovers can browse on their phones, a checkout that accepts the payment methods Vietnamese buyers actually use, digital files that reach buyers reliably and safely, and a portfolio that makes Sam Thuong look like the professional he is.
+It exists because Sam Thuong's photography has no dedicated home that does justice to it. A social feed scatters the work and a marketplace listing strips away the story. SamThuongShop gathers the best images and the recognition they've earned in one place, bilingual for Vietnamese and English audiences, simple enough that one operator can keep it current.
+
+Success looks like: visitors land on the galleries, explore them, see the achievements, and reach out. A small, reliable print shop is there for those who want to take a picture home.
+
+*(Revised 2026-10-29: portfolio-first pivot; see `sprint-change-proposal-2026-10-29.md`.)*
 
 ## 2. Target User
 
 ### 2.1 Jobs To Be Done
 
-- **Buy a piece of Sam Thuong's bird art** — a fan or bird enthusiast wants a specific bird image, as a print for their wall or as a digital file, and wants to pay the way they normally pay online in Vietnam.
-- **Get the image now (digital) or delivered (physical)** — the buyer wants instant access to a downloadable file, or reliable domestic shipping for a print, and wants to know their order's status.
-- **See who Sam Thuong is and judge the quality of his work** — a visitor (potential buyer, collaborator, or follower) wants to browse his portfolio and understand his professional standing before buying or reaching out.
-- **Run the shop single-handedly** — the operator (Thinh An) wants to add/edit products, process and fulfill orders, and update portfolio content quickly, alone, without technical overhead.
+- **See who Sam Thuong is and judge the quality of his work**: a visitor (potential buyer, collaborator, or follower) wants to browse his portfolio and understand his professional standing.
+- **Verify his professional standing**: an editor, organiser, collaborator or fan wants to see the awards he has won, where he has exhibited, where his work has been published, and the honours he holds.
+- **Get in touch**: a visitor wants to reach Sam Thuong about his work, a collaboration, licensing or a print.
+- *(secondary)* **Buy a piece of Sam Thuong's bird art**: a fan or bird enthusiast wants a specific bird image, as a print for their wall or as a digital file, and wants to pay the way they normally pay in Vietnam.
+- *(secondary)* **Get the image delivered (physical) or now (digital)**: the buyer wants reliable domestic shipping for a print, or instant access to a downloadable file, and wants to know their order's status.
+- **Run the site single-handedly**: the operator (Thinh An) wants to keep galleries, achievements and About current, and, when the shop is used, manage products and orders quickly, alone, without technical overhead.
 
 ### 2.2 Non-Users (v1)
 
@@ -37,22 +44,27 @@ Success looks like: a live catalog fellow bird lovers can browse on their phones
 
 ### 2.3 Key User Journeys
 
-- **UJ-1. Lan buys a framed-worthy print of a kingfisher.**
+- **UJ-1. A visitor discovers Sam Thuong's work.** *(primary)*
+  - **Persona + context:** Hà, a nature-magazine editor, gets a shared link to the site.
+  - **Entry state:** unauthenticated, on her phone, arriving at Home.
+  - **Path:** Home opens on a full-bleed photograph and a featured selection from the Galleries. She opens the **Portfolio**, browses a Gallery and steps through images in the lightbox. She checks **Achievements** (awards, exhibitions, publications, honours) and reads **About**.
+  - **Climax:** within a minute she has seen enough of the work and its recognition to judge him a serious professional.
+  - **Resolution:** she uses **Contact** to ask about licensing an image for an article. **Branch:** a different visitor sees "View this print" on a gallery image and continues into UJ-2.
+
+- **UJ-2. Lan buys a framed-worthy print of a kingfisher.** *(secondary: Shop)*
   - **Persona + context:** Lan, an amateur birdwatcher in Hanoi, follows Sam Thuong and wants one of his kingfisher shots on her wall.
-  - **Entry state:** unauthenticated, on her phone, arriving from a social link to a product page.
-  - **Path:** she views the product, chooses the **Physical Print** option and a size, adds it to the **Cart**, checks out as a guest, enters her shipping address, and pays by scanning the **VietQR** code with her banking app. `[ASSUMPTION: VietQR (via the payOS gateway) is the primary electronic method for v1.]`
+  - **Entry state:** unauthenticated, on her phone, arriving from a gallery image's "View this print" link (or a social link to a product page).
+  - **Path:** she views the product, chooses the **Physical Print** option and a size, adds it to the **Cart**, checks out as a guest, enters her shipping address, and pays by **COD** (or by scanning a **VietQR** code once online payment is enabled). `[ASSUMPTION: COD at launch; VietQR (via payOS) in the post-launch shop phase.]`
   - **Climax:** she sees an order confirmation with an order number and an estimated handling/shipping note; the value landed when she got a clear "we've got your order" screen and a confirmation message.
   - **Resolution:** she waits for delivery; the operator sees the order and ships it. **Edge case:** if her VietQR payment fails or she abandons it, the Order stays *Pending Payment* and is not fulfilled; she can return and pay again.
 
-- **UJ-2. Minh buys and downloads a digital image for his desktop.**
+- **UJ-3. Minh buys and downloads a digital image for his desktop.** *(secondary: enabled once digital delivery ships)*
   - **Persona + context:** Minh wants a high-resolution digital file of a specific heron photo, for personal use.
   - **Entry state:** unauthenticated, on desktop, browsing a Collection.
   - **Path:** he opens the product, chooses the **Digital Download** option (seeing a watermarked preview), adds it to the cart, and checks out. `[ASSUMPTION: previews are watermarked; purchased downloads are not.]` He pays by scanning the **VietQR** code.
   - **Climax:** after payment is confirmed, he receives a secure download link and gets the file; value landed the moment the download starts.
   - **Resolution:** he can re-download the file (for a limited window, or from an account if he made one). **Edge case:** if the download link expires, he can request a fresh link or re-download from his account. `[ASSUMPTION: re-download is available via account and/or a time-limited link.]`
 
-- **UJ-3. A visitor evaluates Sam Thuong's work.** *(portfolio, lighter)*
-  - A potential buyer or collaborator lands on the site, browses the **Portfolio** galleries and reads Sam Thuong's short profile, forms an impression of his professionalism, and either buys a product or uses the contact option to reach him.
 
 ## 3. Glossary
 
@@ -68,18 +80,70 @@ Success looks like: a live catalog fellow bird lovers can browse on their phones
 - **Order Status** — the state of an Order in fulfillment (e.g. *Pending Payment*, *Paid*, *Processing*, *Shipped*, *Completed*, *Cancelled*). `[ASSUMPTION: this status set; refine in UX.]`
 - **Customer** — a buyer. May check out as a guest or as a registered Account.
 - **Account** — an optional registered Customer profile that stores order history and enables Digital Download re-download.
-- **Operator** — the single administrator (Thinh An) who manages Products, Orders, and Portfolio content. The only privileged role.
-- **Portfolio** — the non-commercial showcase area of the site: Sam Thuong's galleries and profile.
-- **Gallery** — a set of images within the Portfolio, presented for viewing (not necessarily for sale).
+- **Operator** — the single administrator (Thinh An) who manages Portfolio content (Galleries, Achievements, About) and, for the Shop, Products and Orders. The only privileged role.
+- **Portfolio** — the primary, non-commercial showcase area of the site: Sam Thuong's Galleries, Achievements and profile. It is the default destination for every visitor.
+- **Gallery** — a set of images within the Portfolio, presented for viewing (not necessarily for sale). A Gallery may sit under one parent Gallery for grouping (e.g. *Chim Việt Nam* → *Tràm Chim*).
+- **Achievement** — a recorded recognition of Sam Thuong's work, of one of four kinds: **Award** (a prize or placing in a competition), **Exhibition** (a show where the work was displayed), **Publication** (a magazine, book, article or press feature), or **Honour** (a membership, distinction or title, e.g. an association membership, a FIAP distinction, a brand ambassadorship). Has bilingual title/description, a year/date, an organiser/venue/outlet, an optional link and an optional image.
+- **Featured** — an Operator-set flag on a Gallery image or Achievement that surfaces it on Home.
 - **Download Link** — a secured, time-limited URL that delivers a purchased Digital Download file.
 - **License** — the usage terms granted with a Digital Download (personal, non-commercial use in v1).
 - **Payment Method** — a way the Customer pays: **VietQR** bank transfer (via the payOS gateway) or **Cash on Delivery (COD)**. Momo/ZaloPay wallets are deferred post-launch (they require business registration). `[ASSUMPTION: VietQR + COD for v1.]`
 
 ## 4. Features
 
-*Each subsection is a coherent feature: behavioral description first, FRs nested. FRs are numbered globally so downstream artifacts have stable references. Glossary terms are used exactly.*
+*Each subsection is a coherent feature: behavioral description first, FRs nested. FRs are numbered globally so downstream artifacts have stable references (they are not renumbered when sections move). Glossary terms are used exactly. §4.1 (Portfolio) is primary; §4.2–§4.6 describe the secondary Shop.*
 
-### 4.1 Catalog & Storefront
+### 4.1 Portfolio, Achievements & About
+
+**Description:** **The heart of the site.** It presents Sam Thuong as a professional birder through a portfolio-led Home, curated Galleries, a record of Achievements, a short profile/bio and a way to contact him. Every visitor lands here first. Portfolio images are for viewing; some may link to a purchasable Product, which is the only bridge into the Shop. Realizes UJ-1.
+
+**Functional Requirements:**
+
+#### FR-16: Browse portfolio galleries
+
+A visitor can browse the Portfolio Galleries. Realizes UJ-1.
+
+**Consequences (testable):**
+- Galleries display Sam Thuong's images at good quality on desktop and mobile.
+- A Gallery image may optionally link to a related Product.
+- The Portfolio is reachable in one tap from every page and is the first item in the primary navigation.
+- Captions show the species name in both Vietnamese and English, plus location.
+
+#### FR-17: View profile / about
+
+A visitor can read Sam Thuong's profile/bio.
+
+**Consequences (testable):**
+- The About content (bio, professional background) is viewable and Operator-editable.
+
+#### FR-18: Contact
+
+A visitor can reach Sam Thuong / the shop.
+
+**Consequences (testable):**
+- An enquiry form (name, email, enquiry type: print / licensing / collaboration / other, message) delivers to the Operator by email, and listed channels (email, Facebook, Zalo) are shown. *(OQ-1 resolved 2026-10-29.)*
+
+#### FR-26: Browse achievements
+
+A visitor can see Sam Thuong's Achievements, grouped by kind. Realizes UJ-1.
+
+**Consequences (testable):**
+- The Achievements page lists Awards & competitions, Exhibitions, Publications & press, and Honours & memberships as separate groups, each newest-first.
+- Each Achievement shows its title, year/date and organiser/venue/outlet in the active language (Vietnamese fallback). Where present it also shows a description/excerpt, an external link (opens in a new tab) and an image.
+- An empty group is hidden, not shown as an empty heading.
+
+#### FR-27: Portfolio-led landing and navigation
+
+Every visitor is led to the Portfolio first. Realizes UJ-1.
+
+**Consequences (testable):**
+- Home opens on a full-bleed photograph and a featured selection of Gallery images, followed by highlighted Achievements and a short About hook. Any Shop entry on Home is a single secondary link, never above the fold.
+- Primary navigation order is **Portfolio · Achievements · About · Contact · Shop**.
+- The Cart indicator appears only when the Cart is non-empty. Account sign-in is reachable from the footer and from Shop surfaces, not from the top bar.
+
+### 4.2 Catalog & Storefront
+
+*Secondary: the optional Shop.*
 
 **Description:** The public store where Customers browse Products. Products are organized into Collections and are individually viewable on a product detail page that shows the available Variants (Physical Print sizes and/or Digital Download tiers), price in VND, imagery, and a short description. Digital previews are shown watermarked. The storefront is image-forward and works well on phones. Realizes UJ-1, UJ-2.
 
@@ -120,7 +184,9 @@ A Customer can view the storefront and Portfolio in either Vietnamese or English
 - The chosen language persists across pages for the session.
 - `[ASSUMPTION: Vietnamese and English only; language falls back to Vietnamese if a translation is missing.]`
 
-### 4.2 Cart & Checkout
+### 4.3 Cart & Checkout
+
+*Secondary: the optional Shop.*
 
 **Description:** Customers add Variants to a Cart and check out. Checkout is available to guests; an Account is optional. A shipping address is required only when the Cart contains at least one Physical Print; a Cart of only Digital Downloads skips shipping entirely. Prices, subtotals, shipping, and totals are shown in VND. Realizes UJ-1, UJ-2.
 
@@ -161,7 +227,9 @@ A Customer sees an itemized total (items + shipping, if any) in VND before payin
 - The summary shows item subtotal, the Operator-configured shipping fee (0 for digital-only Carts; see FR-20), and grand total in VND.
 - The total the Customer approves equals the amount charged.
 
-### 4.3 Payments
+### 4.4 Payments
+
+*Secondary: the optional Shop.*
 
 **Description:** Checkout collects payment via local Vietnamese Payment Methods. Card data and payment credentials are handled by the payment provider, not stored by SamThuongShop. `[ASSUMPTION: v1 payment methods are VietQR (via payOS) + COD for physical orders; Momo/ZaloPay wallets deferred — architecture-confirmed.]`
 
@@ -185,7 +253,9 @@ For VietQR, the Customer is shown a QR code to scan with their banking app; the 
 - The Customer is shown the transfer details and a reference for their Order.
 - The Order remains unfulfilled (Digital Download not delivered, Physical Print not shipped) until the Operator marks it Paid. `[ASSUMPTION: bank-transfer confirmation is manual by the Operator in v1.]`
 
-### 4.4 Orders & Fulfillment
+### 4.5 Orders & Fulfillment
+
+*Secondary: the optional Shop.*
 
 **Description:** Every completed checkout creates an Order with an Order Status the Customer can see and the Operator can advance. Physical Prints are fulfilled manually by the Operator (packed and shipped domestically); Digital Downloads are delivered automatically on payment (see §4.5). Realizes UJ-1, UJ-2.
 
@@ -216,7 +286,9 @@ The Operator can cancel an Order that is unpaid or cannot be fulfilled.
 - An Order can be moved to *Cancelled*; a cancelled Order is not fulfilled.
 - A cancelled Digital Download Order has its Download Link invalidated.
 
-### 4.5 Digital Delivery & Licensing
+### 4.6 Digital Delivery & Licensing
+
+*Secondary: the optional Shop.*
 
 **Description:** When an Order containing a Digital Download is Paid, the Customer is given a secure, time-limited Download Link to the un-watermarked file. Files are protected so they are not publicly guessable or hotlinkable. Each Digital Download is sold under a personal-use License. Realizes UJ-2.
 
@@ -248,37 +320,9 @@ The personal-use License is presented at or before purchase of a Digital Downloa
 - The License terms (personal, non-commercial use) are visible on the product detail page or at checkout for Digital Download Variants.
 - `[ASSUMPTION: single personal-use License applies to all Digital Downloads in v1.]`
 
-### 4.6 Portfolio & About
-
-**Description:** The showcase area presenting Sam Thuong as a professional birder: curated Galleries of his work and a short profile/bio, plus a way to contact him. Portfolio images are for viewing; some may link to a purchasable Product. Realizes UJ-3.
-
-**Functional Requirements:**
-
-#### FR-16: Browse portfolio galleries
-
-A visitor can browse the Portfolio Galleries. Realizes UJ-3.
-
-**Consequences (testable):**
-- Galleries display Sam Thuong's images at good quality on desktop and mobile.
-- A Gallery image may optionally link to a related Product.
-
-#### FR-17: View profile / about
-
-A visitor can read Sam Thuong's profile/bio.
-
-**Consequences (testable):**
-- The About content (bio, professional background) is viewable and Operator-editable.
-
-#### FR-18: Contact
-
-A visitor can reach Sam Thuong / the shop.
-
-**Consequences (testable):**
-- A contact method (form or listed channels) is available. `[ASSUMPTION: a simple contact form or listed social/email links suffice for v1.]`
-
 ### 4.7 Operator Admin
 
-**Description:** A simple, single-user administrative area where the Operator manages everything: Products and Variants, prices, Collections, Orders, and Portfolio/About content. Designed for one non-technical person; no multi-user roles or permissions. Realizes the operator JTBD.
+**Description:** A simple, single-user administrative area where the Operator manages everything: Portfolio content (Galleries, Achievements, About) and, for the Shop, Products and Variants, prices, Collections and Orders. Designed for one non-technical person; no multi-user roles or permissions. Realizes the operator JTBD.
 
 **Functional Requirements:**
 
@@ -311,11 +355,13 @@ The Operator can view and act on Orders (see FR-11, FR-12).
 
 #### FR-22: Manage portfolio content
 
-The Operator can edit Galleries and the About/profile content.
+The Operator can edit Galleries, Achievements, and the About/profile content.
 
 **Consequences (testable):**
-- The Operator can add/remove Gallery images and edit About text.
-- The Operator can provide About text (and any captions) in both Vietnamese and English (supports FR-25).
+- The Operator can create, order and remove Galleries (optionally grouped under a parent Gallery), and add, reorder, caption and remove Gallery images.
+- The Operator can create, edit, order and delete Achievements of each kind.
+- The Operator can mark Gallery images and Achievements as **Featured** for Home.
+- The Operator can provide About text, captions and Achievement text in both Vietnamese and English (supports FR-25).
 
 #### FR-23: Operator authentication
 
@@ -356,16 +402,23 @@ A Customer can create and sign in to an Account.
 
 ### 6.1 In Scope
 
-- Catalog & storefront with Collections, product detail, and bilingual language toggle (FR-1–FR-3, FR-25).
-- Cart and guest/account checkout with conditional shipping (FR-4–FR-7).
-- VietQR (via payOS) and COD-for-physical payment methods (FR-8–FR-9). Momo/ZaloPay wallets deferred post-launch.
-- Orders with status tracking and manual physical fulfillment (FR-10–FR-12).
-- Automated, secured Digital Download delivery + re-download + personal-use License (FR-13–FR-15).
-- Portfolio galleries, About, and contact (FR-16–FR-18).
-- Simple single-user Operator admin for products, collections, orders, portfolio (FR-19–FR-23).
+**Launch (showcase):**
+- Portfolio-led Home and navigation (FR-27).
+- Portfolio Galleries with lightbox, Achievements, About and Contact (FR-16, FR-26, FR-17, FR-18).
+- Operator admin for Galleries, Achievements and About (FR-22, FR-23).
+- Bilingual Vietnamese + English (FR-25), responsive, SEO and share previews.
+
+**Launch (secondary shop — already built, kept live):**
+- Catalog, product detail, Collections (FR-1, FR-2, FR-19, FR-20); cart and guest/account checkout with conditional shipping (FR-4–FR-7).
+- **COD for Physical Prints** (FR-8, COD path); Operator order view / advance / mark paid (FR-11, FR-21).
 - Optional Customer accounts (FR-24).
-- Email confirmations and Digital Download links.
-- Responsive web, VND, Vietnamese market, bilingual Vietnamese + English UI.
+- Interim guard: Physical Prints only, COD only, until the post-launch shop phase.
+
+**Post-launch shop phase (deferred, still planned):**
+- VietQR via payOS (FR-8 online path, FR-9), blocked on payOS registration.
+- Order confirmation email (FR-10 email consequence).
+- Digital Download delivery, re-download and License (FR-13–FR-15).
+- Operator cancel (FR-12); basic search (FR-3).
 
 ### 6.2 Out of Scope for MVP
 
@@ -376,25 +429,29 @@ A Customer can create and sign in to an Account.
 - Languages beyond Vietnamese and English.
 - Analytics dashboards beyond basic web analytics.
 - Multiple operator accounts / role permissions.
+- A Journal (field notes / essays and embedded videos): backlog, after the showcase.
 
 ## 7. Success Metrics
 
-*Lean, stakes-appropriate. Each cross-references the FR(s) it validates.*
+*Lean, stakes-appropriate. Each cross-references the FR(s) it validates. Re-weighted 2026-10-29 for the portfolio-first pivot.*
 
 **Primary**
-- **SM-1**: **First real sales** — the store completes paid Orders of both a Physical Print and a Digital Download within the first month of launch. Validates FR-8, FR-11, FR-13.
-- **SM-2**: **Catalog live** — Sam Thuong's initial set of Products is published and buyable at launch. Validates FR-1, FR-2, FR-19.
+- **SM-1: Showcase live.** Galleries, Achievements and About are published in both languages at launch. Validates FR-16, FR-17, FR-22, FR-26.
+- **SM-2: Portfolio engagement.** Most visitors who land on Home go on to open a Gallery or the lightbox, and a meaningful share view Achievements or About. Validates FR-16, FR-26, FR-27. `[ASSUMPTION: baseline set post-launch.]`
+- **SM-3: Enquiries.** Visitors use Contact to reach Sam Thuong (collaborations, licensing, prints). Validates FR-18.
 
-**Secondary**
-- **SM-3**: **Digital delivery reliability** — ~100% of Paid Digital Download Orders result in a successful download without Operator intervention. Validates FR-13, FR-14.
-- **SM-4**: **Portfolio engagement** — visitors reach the Portfolio and a meaningful share proceed to a Product or contact. Validates FR-16, FR-18. `[ASSUMPTION: baseline set post-launch.]`
+**Secondary (shop)**
+- **SM-4: First print sale.** A Physical Print Order is placed and fulfilled via COD within the first months after launch. Validates FR-8, FR-11.
+- **SM-5: Digital delivery reliability.** Applies once digital delivery ships: about 100% of Paid Digital Download Orders download without Operator intervention. Validates FR-13, FR-14.
 
 **Counter-metrics (do not optimize)**
-- **SM-C1**: **Operator effort per order** should stay low — the store must not become a full-time job for one person. Counterbalances SM-1 (don't chase volume by adding manual overhead).
+- **SM-C1**: **Operator effort per order** should stay low — the store must not become a full-time job for one person. Counterbalances SM-4 (don't chase volume by adding manual overhead).
 - **SM-C2**: **Digital-file leakage** — un-watermarked files must not become freely accessible. Counterbalances any push to simplify delivery at the expense of FR-13's protections.
+- **SM-C3**: **Shop intrusion** — shop prompts must not crowd the portfolio: no sales banners, no shop CTA above the fold on Home. Counterbalances SM-4.
 
 ## 8. Open Questions
 
+0. **Contact mechanism (OQ-1)** — *RESOLVED 2026-10-29:* enquiry form emailed to the Operator + listed email/Facebook/Zalo (FR-18).
 1. **Payment providers** — *RESOLVED in architecture:* v1 = **payOS (VietQR) + COD**. Momo/ZaloPay wallet balances need business registration + a VNPay/OnePay contract, so they are **deferred post-launch**.
 2. **Shipping-rate model** — flat fee, weight-based, or per-region? Who bears cost? (Drives FR-6, FR-7.)
 3. **Digital Download policy** — link expiry window and download-count limits; exact License wording. (Drives FR-13, FR-15.)
@@ -405,26 +462,28 @@ A Customer can create and sign in to an Account.
 *Every `[ASSUMPTION]` from the document, for explicit confirmation:*
 
 - §2.1/§2.2 — SamThuongShop sells exclusively Sam Thuong's work in v1 (single-artist, not a marketplace).
-- §2.3/§4.3 — v1 Payment Methods are VietQR (via payOS) + COD (physical-only); Momo/ZaloPay wallets deferred post-launch.
-- §2.3/§4.1 — Digital previews are watermarked; purchased downloads are un-watermarked.
-- §2.3/§4.5 — Re-download is available via Account and/or a fresh time-limited Download Link.
+- §2.3/§4.4 — v1 Payment Methods are VietQR (via payOS) + COD (physical-only); Momo/ZaloPay wallets deferred post-launch.
+- §2.3/§4.2 — Digital previews are watermarked; purchased downloads are un-watermarked.
+- §2.3/§4.6 — Re-download is available via Account and/or a fresh time-limited Download Link.
 - §3 — The Order Status set is *Pending Payment / Paid / Processing / Shipped / Completed / Cancelled* (refine in UX).
-- §4.1 — Basic name/Collection search is sufficient for v1 (no faceted search).
-- §4.1 — Language toggle covers Vietnamese and English only; missing translations fall back to Vietnamese.
+- §4.2 — Basic name/Collection search is sufficient for v1 (no faceted search).
+- §4.2 — Language toggle covers Vietnamese and English only; missing translations fall back to Vietnamese.
 - §4.7 — A flat shipping fee applies in v1 (final rate model per Open Question 2).
-- §4.2 — Digital Download Variants are limited to quantity 1 per Order.
-- §4.3 — COD is offered only for Orders containing a Physical Print and no Digital Download; a COD Order is placed as *Processing* and marked *Paid* on cash receipt.
-- §4.3 — Bank-transfer payment is confirmed manually by the Operator in v1.
-- §4.4 — Physical Prints are made to order; no stock is tracked. *(confirmed)*
-- §4.5 — Download Link expiry/use-count policy is set in architecture; guests can request a fresh link via Order reference.
-- §4.5 — A single personal-use License applies to all Digital Downloads in v1.
-- §4.6 — A simple contact form or listed social/email links suffice for v1.
+- §4.3 — Digital Download Variants are limited to quantity 1 per Order.
+- §4.4 — COD is offered only for Orders containing a Physical Print and no Digital Download; a COD Order is placed as *Processing* and marked *Paid* on cash receipt.
+- §4.4 — Bank-transfer payment is confirmed manually by the Operator in v1.
+- §4.5 — Physical Prints are made to order; no stock is tracked. *(confirmed)*
+- §4.6 — Download Link expiry/use-count policy is set in architecture; guests can request a fresh link via Order reference.
+- §4.6 — A single personal-use License applies to all Digital Downloads in v1.
+- §4.1 — Contact is an enquiry form + listed channels *(confirmed, OQ-1)*.
 - §4.7 — Single Operator credential; no role hierarchy.
 - §4.8 — Email + password registration; social login not required in v1.
-- §7 — SM-4 (portfolio engagement) baseline is set after launch once real traffic exists.
+- §7 — SM-2 (portfolio engagement) baseline is set after launch once real traffic exists.
+- §4.1 — Achievements have exactly four kinds (Award, Exhibition, Publication, Honour) in v1.
+- §6.1 — Until the post-launch shop phase, the live Shop sells Physical Prints via COD only.
 - §10 — Responsive web only (no native app).
 - §10 — Bilingual UI (Vietnamese + English); the Operator supplies Product and Portfolio content in both languages.
-- §4.4/§4.5 — Order confirmations and Digital Download links are delivered by email. *(confirmed)*
+- §4.5/§4.6 — Order confirmations and Digital Download links are delivered by email. *(confirmed)*
 
 ## 10. Cross-Cutting NFRs
 
@@ -451,4 +510,4 @@ A Customer can create and sign in to an Account.
 
 - **Platform** — responsive web (desktop + mobile browsers). `[ASSUMPTION]`
 - **Languages** — bilingual Vietnamese + English, with a language toggle.
-- **Aesthetic & Tone** — image-forward and clean; the design should get out of the way and let the bird photography lead. Professional and calm, matching a serious birder's portfolio; not busy or "discount-store" loud.
+- **Aesthetic & Tone** — image-forward and clean; the design should get out of the way and let the bird photography lead. Professional and calm, matching a serious birder's portfolio; not busy or "discount-store" loud. The portfolio leads; commerce stays quiet and secondary in every layout.

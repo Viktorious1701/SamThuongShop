@@ -54,9 +54,10 @@ model Product {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  variants    ProductVariant[]
-  images      ProductImage[]
-  collections Collection[] // Story 2.3 — many-to-many
+  variants        ProductVariant[]
+  images          ProductImage[]
+  collections     Collection[] // Story 2.3 — many-to-many
+  portfolioImages PortfolioImage[] // Story 1.6 — portfolio images linking to this print
 }
 
 // A specific purchasable form of a Product with its own integer-VND price.
@@ -144,11 +145,28 @@ enum OrderStatus {
   CANCELLED
 }
 
+// How the buyer settles the Order (Story 3.4). COD = cash collected on
+// delivery (physical-only carts, AD-8) — no money flows through the app, the
+// courier remits cash to the Operator who then marks the Order paid.
+// VIETQR is the online path (Story 3.3), still pending until that lands.
+enum PaymentMethod {
+  COD
+  VIETQR
+}
+
 model Order {
   id        String      @id @default(cuid())
   reference String      @unique // short uppercase, for guest lookup (AD-14)
   status    OrderStatus @default(PENDING_PAYMENT)
   locale    String // buyer locale at creation (for snapshots + email)
+
+  // Payment (Story 3.4). COD orders enter at PROCESSING and are settled in
+  // cash on delivery; the Operator flips `isPaid` on cash receipt (Epic 4.2).
+  // No money moves through the app — these fields only track state.
+  paymentMethod PaymentMethod @default(VIETQR)
+  isPaid        Boolean       @default(false)
+  paidAt        DateTime?
+  trackingNote  String? // optional shipment note recorded by the Operator (4.2)
 
   // Purchaser: always an email (guest lookup, AD-14); userId set when signed in.
   customerEmail String
@@ -192,4 +210,116 @@ model OrderLine {
   lineTotalVnd Int
 
   @@index([orderId])
+}
+
+// --- Epic 1, Story 1.6 — Portfolio galleries -----------------------------
+// The portfolio is the site's lead surface (portfolio-first pivot). Two
+// levels only: a Gallery with children is a GROUP (e.g. "Chim Việt Nam");
+// a Gallery without children holds images (e.g. "Tràm Chim"). Depth ≤ 1 and
+// "images only in leaf galleries" are enforced in lib/server/portfolio.ts.
+// Bilingual content per-locale on the row (AD-7).
+model Gallery {
+  id            String   @id @default(cuid())
+  slug          String   @unique // public URL key: /portfolio/{slug}
+  nameVi        String
+  nameEn        String
+  descriptionVi String?
+  descriptionEn String?
+  position      Int      @default(0) // order among its siblings
+  published     Boolean  @default(false) // build quietly, publish when ready
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Restrict: a group can't be deleted while it still has child galleries.
+  parentId String?
+  parent   Gallery?  @relation("GalleryTree", fields: [parentId], references: [id], onDelete: Restrict)
+  children Gallery[] @relation("GalleryTree")
+
+  images PortfolioImage[]
+
+  @@index([parentId])
+}
+
+// One portfolio photograph. `key` is the RESIZED display copy in the PUBLIC
+// bucket (≤2400px, metadata stripped, never watermarked); `originalKey` is
+// the full-resolution upload kept in the PRIVATE bucket as the archive and
+// never served (AD-15). width/height reserve the aspect ratio (no layout
+// shift); blurDataUrl is a tiny inline placeholder.
+model PortfolioImage {
+  id        String  @id @default(cuid())
+  // Restrict: a gallery can't be deleted while it still holds images.
+  galleryId String
+  gallery   Gallery @relation(fields: [galleryId], references: [id], onDelete: Restrict)
+
+  key         String
+  originalKey String
+  width       Int
+  height      Int
+  blurDataUrl String
+
+  // Portfolio-only revamp: was speciesVi/En — renamed because not every
+  // photo is a bird (sport, landscape, people). Data kept (RENAME COLUMN).
+  captionVi  String?
+  captionEn  String?
+  locationVi String?
+  locationEn String?
+
+  position Int     @default(0)
+  featured Boolean @default(false) // read by Home (Story 1.10)
+
+  // Optional link to the print for sale. Soft: deleting the Product just
+  // unlinks the image.
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  heroFor SiteContent[] @relation("SiteHero") // the Home hero photo
+
+  createdAt DateTime @default(now())
+
+  @@index([galleryId])
+  @@index([featured])
+  @@index([productId])
+}
+
+// --- Portfolio-only revamp (2026-11-02) — the site's own content ------------
+// One row (id "site"), edited in /admin/site. Holds everything on the public
+// site that isn't a gallery: the Home hero + tagline, the About page (bio,
+// portrait, record lists) and the contact channels. Bilingual per-locale
+// columns (AD-7; English falls back to Vietnamese).
+model SiteContent {
+  id String @id @default("site")
+
+  // Home
+  heroImageId   String?
+  heroImage     PortfolioImage? @relation("SiteHero", fields: [heroImageId], references: [id], onDelete: SetNull)
+  taglineVi     String?
+  taglineEn     String?
+  aboutTeaserVi String?
+  aboutTeaserEn String?
+
+  // About
+  bioVi String?
+  bioEn String?
+
+  // Portrait: resized public copy + private original (same pipeline as photos).
+  portraitKey         String?
+  portraitOriginalKey String?
+  portraitWidth       Int?
+  portraitHeight      Int?
+  portraitBlurDataUrl String?
+
+  // Record — one entry per line: "2025 | Text | https://optional-link"
+  exhibitionsVi String?
+  exhibitionsEn String?
+  awardsVi      String?
+  awardsEn      String?
+  pressVi       String?
+  pressEn       String?
+
+  // Contact
+  email       String?
+  facebookUrl String?
+  zalo        String?
+
+  updatedAt DateTime @updatedAt
 }

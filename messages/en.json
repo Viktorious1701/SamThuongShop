@@ -7,7 +7,9 @@
     "about": "About",
     "contact": "Contact",
     "cart": "Cart",
-    "primaryNav": "Primary navigation"
+    "primaryNav": "Primary navigation",
+    "work": "Work",
+    "footerNav": "Footer navigation"
   },
   "LanguageToggle": {
     "en": "EN",
@@ -16,14 +18,9 @@
     "switchToVi": "Switch to Vietnamese"
   },
   "Footer": {
-    "tagline": "Vietnamese wildlife bird photography — prints and digital downloads, made to order.",
+    "tagline": "Photography by Sâm Thương — birds, sport, landscapes and people.",
     "trackOrder": "Track your order",
     "rights": "© {year} Sâm Thương. All rights reserved."
-  },
-  "HomePage": {
-    "heading": "Sâm Thương",
-    "subheading": "Vietnamese wildlife bird photography — prints and digital downloads, made to order.",
-    "placeholder": "The full home page arrives in a later story."
   },
   "ComingSoon": {
     "note": "Coming soon — full content arrives in a later story."
@@ -125,10 +122,59 @@
     "status_CANCELLED": "Cancelled",
     "format_PRINT": "Print",
     "format_DIGITAL": "Digital",
+    "paymentHeading": "Payment method",
+    "methodCod": "Cash on delivery",
+    "methodCodHint": "Pay in cash when your print is delivered.",
+    "methodVietqr": "Bank transfer / VietQR",
+    "methodVietqrHint": "Online payment arrives soon — your order is saved in the meantime.",
+    "codUnavailableDigital": "Cash on delivery isn't available for digital downloads.",
+    "codOnlyNote": "Payment is cash on delivery for now.",
+    "codPlacedTitle": "Order placed — pay on delivery",
+    "codPlacedBody": "We'll prepare your print and you pay in cash when it arrives. Keep your order reference to track it.",
     "paymentNextTitle": "Next: payment",
     "paymentNextBody": "Payment (VietQR or cash on delivery) arrives in the next update. Your order reference is saved.",
     "orderNotFoundTitle": "Order not found",
     "orderNotFoundBody": "This order reference doesn't match anything, or the link is out of date.",
     "backToShop": "Back to Shop"
+  },
+  "Portfolio": {
+    "title": "Work",
+    "intro": "Photographs by Sâm Thương, gathered by subject. Choose a gallery.",
+    "empty": "New galleries are on their way. Please check back soon.",
+    "imageCount": "{count, plural, one {# photo} other {# photos}}",
+    "breadcrumb": "Breadcrumb",
+    "moreGalleries": "More galleries",
+    "allGalleries": "All galleries",
+    "openImage": "Open photo: {name}",
+    "lightboxLabel": "Photo viewer",
+    "close": "Close",
+    "previous": "Previous photo",
+    "next": "Next photo",
+    "imageOf": "{current} of {total}"
+  },
+  "Home": {
+    "metaTitle": "Sâm Thương — Photography",
+    "defaultTagline": "Birds, sport and people — photographed in Vietnam and around the world.",
+    "selectedWork": "Selected work",
+    "allGalleries": "All galleries",
+    "galleries": "Galleries",
+    "aboutTitle": "About the photographer",
+    "readMore": "Read more"
+  },
+  "About": {
+    "title": "About",
+    "metaDescription": "About Sâm Thương, photographer — biography, exhibitions, awards, press and contact.",
+    "portraitAlt": "Portrait of {name}",
+    "bioPlaceholder": "A short biography is coming soon.",
+    "exhibitions": "Exhibitions",
+    "awards": "Awards",
+    "press": "Press",
+    "opensInNewTab": "opens in a new tab",
+    "contactTitle": "Contact",
+    "contactIntro": "For prints, licensing or collaborations, get in touch directly.",
+    "email": "Email",
+    "facebook": "Facebook",
+    "zalo": "Zalo",
+    "contactEmpty": "Contact details are coming soon."
   }
 }

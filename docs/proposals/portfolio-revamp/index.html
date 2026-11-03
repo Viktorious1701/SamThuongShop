@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sâm Thương — Photography</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="wordmark" href="index.html">Sâm Thương</a>
+      <nav class="site-nav" aria-label="Primary">
+        <ul>
+          <li><a href="work.html">Work</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="about.html#contact">Contact</a></li>
+        </ul>
+      </nav>
+      <span class="lang" aria-label="Language"><b>EN</b> | VN</span>
+    </div>
+  </header>
+
+  <main>
+    <!-- 1. Hero: one full-bleed photograph, name, one line. Nothing else. -->
+    <section class="hero" aria-label="Featured photograph">
+      <img src="../../../image_assets/portfolio/856498917_955713287187014_1468640406051171188_n.jpg" alt="Sarus cranes dancing in a golden wetland" width="2048" height="1365">
+      <div class="hero__text">
+        <div class="wrap">
+          <h1>Sâm Thương</h1>
+          <p>Birds, sport and people — photographed in Vietnam and around the world.</p>
+          <p class="hero__credit">Sarus Crane · Sếu đầu đỏ</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="wrap">
+      <p class="proto-note">&lt;Hero&gt; — the operator picks the hero photo in admin (any Featured photo). Component: <code>components/home/hero.tsx</code></p>
+
+      <!-- 2. Selected work: the Featured photos from every gallery, natural shapes. -->
+      <section class="section" aria-labelledby="selected">
+        <div class="section__head">
+          <h2 id="selected">Selected work</h2>
+          <a href="work.html">All galleries →</a>
+        </div>
+        <p class="proto-note">&lt;PhotoGrid photos=featured&gt; — every photo ticked "Featured", newest first. Click opens the &lt;Lightbox&gt;.</p>
+        <ul class="photo-grid">
+        <li>
+          <figure>
+            <button class="photo-tile" type="button" data-photo="../../../image_assets/portfolio/861232933_3311174955741089_1849411875711851012_n.jpg"
+                    data-caption="Chestnut-breasted Coronet&lt;small&gt;Location TBC&lt;/small&gt;" aria-label="Open photo: Chestnut-breasted Coronet">
+              <img src="../../../image_assets/portfolio/861232933_3311174955741089_1849411875711851012_n.jpg" alt="Chestnut-breasted Coronet — Location TBC" width="1321" height="1849" loading="lazy">
+            </button>
+            <figcaption class="photo-caption">Chestnut-breasted Coronet<small>Location TBC</small></figcaption>
+          </figure>
+        </li>
+        <li>
+          <figure>
+            <button class="photo-tile" type="button" data-photo="../../../image_assets/portfolio/870640616_1753994029025258_2836728605606788557_n.jpg"
+                    data-caption="Dance portrait&lt;small&gt;Studio&lt;/small&gt;" aria-label="Open photo: Dance portrait">
+              <img src="../../../image_assets/portfolio/870640616_1753994029025258_2836728605606788557_n.jpg" alt="Dance portrait — Studio" width="1463" height="2048" loading="lazy">
+            </button>
+            <figcaption class="photo-caption">Dance portrait<small>Studio</small></figcaption>
+          </figure>
+        </li>
+        <li>
+          <figure>
+            <button class="photo-tile" type="button" data-photo="../../../image_assets/portfolio/862046264_1427735108860862_139328830802401322_n.jpg"
+                    data-caption="Patchwork fields from above&lt;small&gt;Location TBC&lt;/small&gt;" aria-label="Open photo: Patchwork fields from above">
+              <img src="../../../image_assets/portfolio/862046264_1427735108860862_139328830802401322_n.jpg" alt="Patchwork fields from above — Location TBC" width="2048" height="1365" loading="lazy">
+            </button>
+            <figcaption class="photo-caption">Patchwork fields from above<small>Location TBC</small></figcaption>
+          </figure>
+        </li>
+        <li>
+          <figure>
+            <button class="photo-tile" type="button" data-photo="../../../image_assets/portfolio/864360622_2383089595766679_6225885480545732255_n.jpg"
+                    data-caption="Shining Sunbeam&lt;small&gt;Location TBC&lt;/small&gt;" aria-label="Open photo: Shining Sunbeam">
+              <img src="../../../image_assets/portfolio/864360622_2383089595766679_6225885480545732255_n.jpg" alt="Shining Sunbeam — Location TBC" width="960" height="1344" loading="lazy">
+            </button>
+            <figcaption class="photo-caption">Shining Sunbeam<small>Location TBC</small></figcaption>
+          </figure>
+        </li>
+        <li>
+          <figure>
+            <button class="photo-tile" type="button" data-photo="../../../image_assets/portfolio/862764608_1118231621130898_3193792342461519000_n.jpg"
+                    data-caption="Hummingbirds at verbena&lt;small&gt;Location TBC&lt;/small&gt;" aria-label="Open photo: Hummingbirds at verbena">
+              <img src="../../../image_assets/portfolio/862764608_1118231621130898_3193792342461519000_n.jpg" alt="Hummingbirds at verbena — Location TBC" width="2048" height="1366" loading="lazy">
+            </button>
+            <figcaption class="photo-caption">Hummingbirds at verbena<small>Location TBC</small></figcaption>
+          </figure>
+        </li>
+        </ul>
+      </section>
+
+      <!-- 3. Galleries: one card per gallery. -->
+      <section class="section" aria-labelledby="galleries">
+        <div class="section__head">
+          <h2 id="galleries">Galleries</h2>
+        </div>
+        <p class="proto-note">&lt;GalleryCardGrid&gt; — one card per published gallery, cover = its first Featured photo.</p>
+        <ul class="categories">
+        <li>
+          <a class="category-card" href="gallery.html">
+            <div class="category-card__frame"><img src="../../../image_assets/portfolio/861232933_3311174955741089_1849411875711851012_n.jpg" alt="" loading="lazy"></div>
+            <div class="category-card__meta"><h3>Birds</h3><span>5 photos</span></div>
+          </a>
+        </li>
+        <li>
+          <a class="category-card" href="#">
+            <div class="category-card__frame"><img src="../../../image_assets/portfolio/862046264_1427735108860862_139328830802401322_n.jpg" alt="" loading="lazy"></div>
+            <div class="category-card__meta"><h3>Landscapes</h3><span>1 photo</span></div>
+          </a>
+        </li>
+        <li>
+          <a class="category-card" href="#">
+            <div class="category-card__frame"><img src="../../../image_assets/portfolio/870640616_1753994029025258_2836728605606788557_n.jpg" alt="" loading="lazy"></div>
+            <div class="category-card__meta"><h3>People &amp; Performance</h3><span>1 photo</span></div>
+          </a>
+        </li>
+        </ul>
+      </section>
+
+      <!-- 4. A single quiet line to About. -->
+      <section class="section" aria-labelledby="about-teaser">
+        <div class="section__head">
+          <h2 id="about-teaser">About the photographer</h2>
+          <a href="about.html">Read more →</a>
+        </div>
+        <p style="max-width:720px;color:var(--ink-muted);margin:0">Short two-line introduction written by Sâm Thương. (Placeholder.)</p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <span>© 2026 Sâm Thương Photography</span>
+      <span><a href="work.html">Work</a> · <a href="about.html">About</a> · <a href="about.html#contact">Contact</a></span>
+    </div>
+  </footer>
+  <!-- Lightbox (one per page; opened by any .photo-tile) -->
+  <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer" hidden>
+    <div class="lightbox__bar">
+      <span data-counter aria-live="polite"></span>
+      <button class="icon-btn lightbox__close" type="button" aria-label="Close">✕</button>
+    </div>
+    <div class="lightbox__stage">
+      <img alt="">
+      <button class="icon-btn lightbox__prev" type="button" aria-label="Previous photo">‹</button>
+      <button class="icon-btn lightbox__next" type="button" aria-label="Next photo">›</button>
+    </div>
+    <p class="lightbox__caption"></p>
+  </div>
+  <script src="lightbox.js"></script>
+</body>
+</html>

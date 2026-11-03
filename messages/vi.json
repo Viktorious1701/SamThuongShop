@@ -7,7 +7,9 @@
     "about": "Giới thiệu",
     "contact": "Liên hệ",
     "cart": "Giỏ hàng",
-    "primaryNav": "Điều hướng chính"
+    "primaryNav": "Điều hướng chính",
+    "work": "Tác phẩm",
+    "footerNav": "Điều hướng chân trang"
   },
   "LanguageToggle": {
     "en": "EN",
@@ -16,14 +18,9 @@
     "switchToVi": "Chuyển sang tiếng Việt"
   },
   "Footer": {
-    "tagline": "Nhiếp ảnh chim hoang dã Việt Nam — bản in và bản số, thực hiện theo yêu cầu.",
+    "tagline": "Nhiếp ảnh của Sâm Thương — chim, thể thao, phong cảnh và con người.",
     "trackOrder": "Theo dõi đơn hàng",
     "rights": "© {year} Sâm Thương. Bảo lưu mọi quyền."
-  },
-  "HomePage": {
-    "heading": "Sâm Thương",
-    "subheading": "Nhiếp ảnh chim hoang dã Việt Nam — bản in và bản số, đặt in theo yêu cầu.",
-    "placeholder": "Trang chủ đầy đủ sẽ có trong các câu chuyện tiếp theo."
   },
   "ComingSoon": {
     "note": "Sắp ra mắt — nội dung đầy đủ sẽ có trong các câu chuyện tiếp theo."
@@ -125,10 +122,59 @@
     "status_CANCELLED": "Đã hủy",
     "format_PRINT": "Bản in",
     "format_DIGITAL": "Bản số",
+    "paymentHeading": "Phương thức thanh toán",
+    "methodCod": "Thanh toán khi nhận hàng (COD)",
+    "methodCodHint": "Trả tiền mặt khi bản in được giao đến bạn.",
+    "methodVietqr": "Chuyển khoản / VietQR",
+    "methodVietqrHint": "Thanh toán trực tuyến sẽ có sớm — đơn hàng của bạn vẫn được lưu.",
+    "codUnavailableDigital": "Không áp dụng thanh toán khi nhận hàng cho bản số.",
+    "codOnlyNote": "Hiện tại chỉ nhận thanh toán khi nhận hàng (COD).",
+    "codPlacedTitle": "Đã đặt hàng — thanh toán khi nhận",
+    "codPlacedBody": "Chúng tôi sẽ chuẩn bị bản in và bạn trả tiền mặt khi nhận hàng. Hãy lưu mã đơn hàng để theo dõi.",
     "paymentNextTitle": "Tiếp theo: thanh toán",
     "paymentNextBody": "Thanh toán (VietQR hoặc COD) sẽ có ở bản cập nhật tới. Mã đơn hàng của bạn đã được lưu.",
     "orderNotFoundTitle": "Không tìm thấy đơn hàng",
     "orderNotFoundBody": "Mã đơn hàng này không khớp, hoặc liên kết đã cũ.",
     "backToShop": "Về Cửa hàng"
+  },
+  "Portfolio": {
+    "title": "Tác phẩm",
+    "intro": "Ảnh của Sâm Thương, sắp xếp theo chủ đề. Mời bạn chọn một bộ ảnh.",
+    "empty": "Các bộ ảnh mới đang được chuẩn bị. Mời bạn quay lại sau.",
+    "imageCount": "{count} ảnh",
+    "breadcrumb": "Đường dẫn",
+    "moreGalleries": "Bộ ảnh khác",
+    "allGalleries": "Tất cả bộ ảnh",
+    "openImage": "Mở ảnh: {name}",
+    "lightboxLabel": "Trình xem ảnh",
+    "close": "Đóng",
+    "previous": "Ảnh trước",
+    "next": "Ảnh tiếp theo",
+    "imageOf": "{current} / {total}"
+  },
+  "Home": {
+    "metaTitle": "Sâm Thương — Nhiếp ảnh",
+    "defaultTagline": "Chim, thể thao và con người — tại Việt Nam và khắp thế giới.",
+    "selectedWork": "Tác phẩm chọn lọc",
+    "allGalleries": "Tất cả bộ ảnh",
+    "galleries": "Bộ ảnh",
+    "aboutTitle": "Về nhiếp ảnh gia",
+    "readMore": "Xem thêm"
+  },
+  "About": {
+    "title": "Giới thiệu",
+    "metaDescription": "Giới thiệu nhiếp ảnh gia Sâm Thương — tiểu sử, triển lãm, giải thưởng, báo chí và liên hệ.",
+    "portraitAlt": "Chân dung {name}",
+    "bioPlaceholder": "Tiểu sử sẽ sớm được cập nhật.",
+    "exhibitions": "Triển lãm",
+    "awards": "Giải thưởng",
+    "press": "Báo chí",
+    "opensInNewTab": "mở trong thẻ mới",
+    "contactTitle": "Liên hệ",
+    "contactIntro": "Về bản in, bản quyền sử dụng ảnh hoặc hợp tác, xin liên hệ trực tiếp.",
+    "email": "Email",
+    "facebook": "Facebook",
+    "zalo": "Zalo",
+    "contactEmpty": "Thông tin liên hệ sẽ sớm được cập nhật."
   }
 }

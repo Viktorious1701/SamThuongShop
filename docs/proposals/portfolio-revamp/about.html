@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>About — Sâm Thương</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="wordmark" href="index.html">Sâm Thương</a>
+      <nav class="site-nav" aria-label="Primary">
+        <ul>
+          <li><a href="work.html">Work</a></li>
+          <li><a href="about.html" aria-current="page">About</a></li>
+          <li><a href="about.html#contact">Contact</a></li>
+        </ul>
+      </nav>
+      <span class="lang" aria-label="Language"><b>EN</b> | VN</span>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap">
+      <section class="about" aria-labelledby="about-title">
+        <div class="about__portrait">Portrait of Sâm Thương<br>(1200 × 1500, from the asset guide)</div>
+        <div class="about__bio">
+          <h1 id="about-title">About</h1>
+          <p>Biography written by Sâm Thương, in Vietnamese and English. Two or three short paragraphs: who he is, what he photographs, where. (Placeholder.)</p>
+          <p class="proto-note">&lt;AboutBio&gt; — one rich-text field per language, edited in admin. No separate Achievements system.</p>
+
+          <!-- The professional record lives here, as a plain list. -->
+          <div class="record">
+            <p class="proto-note">&lt;Record&gt; — a simple list per heading (year + text). Replaces the planned Achievements page / Story 1.9.</p>
+            <h2>Exhibitions</h2>
+            <ul>
+              <li><time>2025</time><span>Exhibition name, venue, city (placeholder)</span></li>
+              <li><time>2023</time><span>Exhibition name, venue, city (placeholder)</span></li>
+            </ul>
+            <h2>Awards</h2>
+            <ul>
+              <li><time>2024</time><span>Award name, organiser (placeholder)</span></li>
+            </ul>
+            <h2>Press</h2>
+            <ul>
+              <li><time>2026</time><span><a href="#">Article title — outlet (placeholder)</a></span></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Contact: listed channels; no form, no accounts. -->
+      <section id="contact" class="contact" aria-labelledby="contact-title">
+        <div>
+          <h2 id="contact-title">Contact</h2>
+          <p>For prints, licensing or collaborations, get in touch directly.</p>
+          <p class="proto-note">&lt;ContactLinks&gt; — three links set in admin. Prints are arranged by message (no shop needed).</p>
+        </div>
+        <ul>
+          <li><a href="mailto:hello@example.com">Email <span>hello@example.com</span></a></li>
+          <li><a href="#">Facebook <span>Sâm Thương Photography</span></a></li>
+          <li><a href="#">Zalo <span>090x xxx xxx</span></a></li>
+        </ul>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <span>© 2026 Sâm Thương Photography</span>
+      <span><a href="work.html">Work</a> · <a href="about.html">About</a> · <a href="about.html#contact">Contact</a></span>
+    </div>
+  </footer>
+
+  <script src="lightbox.js"></script>
+</body>
+</html>

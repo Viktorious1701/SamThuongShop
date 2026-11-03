@@ -9,6 +9,9 @@ import { z } from "zod";
 
 export const checkoutSchema = z.object({
   email: z.string().trim().min(1, "required").email("invalidEmail").max(200),
+  // Story 3.4 — payment method. The action re-checks that COD is only used on
+  // a prints-only cart (AD-8); an invalid value fails safe to VIETQR upstream.
+  paymentMethod: z.enum(["COD", "VIETQR"]),
   shipName: z.string().trim().max(120).optional(),
   shipPhone: z.string().trim().max(40).optional(),
   shipAddress: z.string().trim().max(500).optional(),

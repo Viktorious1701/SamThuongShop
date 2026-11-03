@@ -3,7 +3,8 @@ name: SamThuongShop
 description: Experience contract for SamThuongShop — IA, behavior, states, flows, and accessibility.
 status: final
 created: 2026-07-18
-updated: 2026-07-18
+updated: 2026-10-29
+revision: portfolio-first pivot (sprint-change-proposal-2026-10-29)
 sources:
   - ../../prds/prd-SamThuongShop-2026-07-18/prd.md   # finalized PRD (25 FRs) — inherited by reference
 design: ./DESIGN.md   # visual identity peer; tokens referenced via {path.to.token}
@@ -19,7 +20,7 @@ design: ./DESIGN.md   # visual identity peer; tokens referenced via {path.to.tok
 - **Theme:** **light mode only** for v1. Dark mode is out of scope.
 - **Bilingual:** Vietnamese + English, with an **EN | VN toggle** in the top nav. **Vietnamese is primary, English secondary.** Missing translations **fall back to Vietnamese** (FR-25).
 - **Visual direction:** "Sky & Sedge" — airy modern-magazine, asymmetric editorial layout, photography always leads, UI stays quiet. See `DESIGN.md` for the full look.
-- **Navigation:** one unified top nav — **Home · Shop · Portfolio · About · Contact**, plus cart and the EN|VN toggle. **Shop and Portfolio are peers** (the store and the showcase have equal standing).
+- **Navigation:** one unified top nav — wordmark (→ Home) · **Portfolio · Achievements · About · Contact · Shop**, plus the EN|VN toggle and a cart indicator that appears **only when the cart is non-empty**. **The portfolio leads; the Shop is secondary** — it is the last nav item and is never promoted above the fold on Home. Account sign-in lives in the footer and on Shop surfaces.
 - **Scope:** **customer-facing only.** A single-operator admin exists (product/variant/collection, order, and portfolio/About management — FR-11, FR-12, FR-19–FR-23) but is specified only lightly from the spine tables; it has no dedicated screens or flows in this document.
 
 ## Information Architecture
@@ -27,15 +28,16 @@ design: ./DESIGN.md   # visual identity peer; tokens referenced via {path.to.tok
 ### Nav / sitemap
 
 ```
-Global chrome (top nav + footer + EN|VN toggle)
-├── Home
-├── Shop ──────────┬── Collection page ──── Product detail ──── Cart ──── Checkout ──── Order confirmation
-│                   └── (basic search)                                                        │
-├── Portfolio ───── Gallery ──(image → optional linked Product detail)                        │
-├── About                                                                        Order status / tracking
-├── Contact                                                                                   │
-├── Cart (icon) ──── Checkout ──── Order confirmation ──── Order status                        │
-└── Account ──── Order history ──── Re-download ◄──────────────────────────────────────────────┘
+Global chrome (top nav + footer + EN|VN toggle; cart indicator only when non-empty)
+├── Home (photo-led: hero · featured grid per gallery group · achievements strip · About hook)
+├── Portfolio ──── Gallery group ──── Gallery ──(image → lightbox → optional "View this print" → Product detail)
+├── Achievements ── (Awards · Exhibitions · Publications · Honours)
+├── About
+├── Contact (enquiry form + listed channels)
+├── Shop (secondary) ─┬── Collection page ──── Product detail ──── Cart ──── Checkout ──── Order confirmation
+│                     └── (basic search — deferred)                                                │
+│                                                                                     Order status / tracking
+└── Account (footer / Shop surfaces) ──── Order history ──── Re-download
                  (register / login / logout)
 [Operator admin — separate authenticated area, out of scope for screens]
 ```
@@ -44,8 +46,12 @@ Global chrome (top nav + footer + EN|VN toggle)
 
 | # | Surface | Purpose | Reached from | FRs |
 |---|---|---|---|---|
-| 1 | **Home / landing** | Image-led entry; featured Products + Collections, portfolio teaser, brief About hook | Nav "Home" / logo / cold entry | FR-1, FR-16, FR-25 |
-| 2 | **Shop catalog** | All published Products, grouped by Collection, with basic name/Collection search | Nav "Shop" | FR-1, FR-3, FR-25 |
+| 1 | **Home / landing** | Photo-led entry: full-bleed hero, one featured grid per gallery group ("View all / Xem tất cả"), highlighted Achievements, About hook; one quiet Shop link below the fold | Logo / cold entry | FR-27, FR-16, FR-26, FR-25 |
+| 10 | **Portfolio galleries** | Gallery groups → Galleries → grid + lightbox; image may link to a Product | Nav "Portfolio", Home grids | FR-16 |
+| 14 | **Achievements** | Awards & competitions, Exhibitions, Publications & press, Honours & memberships — grouped, newest first; links out; optional images | Nav "Achievements", Home highlights, About | FR-26 |
+| 11 | **About / profile** | Bilingual bio, professional standing; links on to Portfolio + Achievements | Nav "About", Home hook | FR-17 |
+| 12 | **Contact** | Enquiry form (print / licensing / collaboration / other) + listed email, Facebook, Zalo | Nav "Contact", footer | FR-18 |
+| 2 | **Shop catalog** *(secondary)* | All published Products, grouped by Collection, with basic name/Collection search | Nav "Shop" | FR-1, FR-3, FR-25 |
 | 3 | **Collection page** | One curated grouping (species / habitat / theme); its Products only | Shop, Home feature, footer | FR-1 |
 | 4 | **Product detail** | Variants (print sizes / digital tiers), watermarked preview, VND price, License, add-to-cart, made-to-order note | Catalog, Collection, Portfolio image link, search | FR-2, FR-4, FR-15, FR-25 |
 | 5 | **Cart** | Line items, qty rules (digital qty=1), VND running total | Nav cart icon, "Add to cart" toast | FR-4, FR-7 |
@@ -53,20 +59,17 @@ Global chrome (top nav + footer + EN|VN toggle)
 | 7 | **Order confirmation** | Order # + on-screen + email confirmation; transfer instructions / COD note / digital delivery entry | Checkout submit | FR-10, FR-9, FR-13 |
 | 8 | **Order status / tracking** | Guest lookup via Order reference; status + shipment note; guest re-download request | Confirmation link, footer "Track order", email | FR-10, FR-14 |
 | 9 | **Account** | Register / login / logout; order history; digital re-download | Nav "Account", checkout upsell | FR-24, FR-10, FR-14 |
-| 10 | **Portfolio galleries** | Gallery grid + lightbox; image may link to a Product | Nav "Portfolio", Home teaser | FR-16 |
-| 11 | **About / profile** | Bilingual bio, professional standing | Nav "About", Home hook | FR-17 |
-| 12 | **Contact** | Contact form or listed channels | Nav "Contact", footer | FR-18 |
 | 13 | **Global chrome** | Persistent nav, footer, language toggle, cart indicator | Everywhere | FR-25, nav |
 | — | *Operator admin* | *Products/variants/collections, orders, portfolio/About — single user, no customer-facing screens* | *Separate auth area* | *FR-11, FR-12, FR-19–FR-23* |
 
 ### Reference mockups
 
-Full HTML mockups of the four highest-signal surfaces live in [`mockups/`](./mockups/) — [product detail](./mockups/mock-product-detail.html), [shop catalog](./mockups/mock-shop-catalog.html), [checkout](./mockups/mock-checkout.html), [portfolio](./mockups/mock-portfolio.html). They illustrate the Sky & Sedge look with real content; **where a mockup and these spines disagree, the spines win** (the mockups predate the final review fixes to focus rings, input borders, and status pills).
+Full HTML mockups of the four highest-signal surfaces live in [`mockups/`](./mockups/) — [product detail](./mockups/mock-product-detail.html), [shop catalog](./mockups/mock-shop-catalog.html), [checkout](./mockups/mock-checkout.html), [portfolio](./mockups/mock-portfolio.html). They illustrate the Sky & Sedge look with real content; **where a mockup and these spines disagree, the spines win** (`mock-shop-catalog.html` and `mock-product-detail.html` also predate the portfolio-first pivot — their nav order is superseded by the Foundation rule) (the mockups predate the final review fixes to focus rings, input borders, and status pills).
 
 ### Surface closure
 
 **Holds.** Every customer-facing PRD need has a landing surface, and every surface has an entry flow:
-- FR-1→(1,2,3) · FR-2→4 · FR-3→2 · FR-4→(4,5) · FR-5,6,7→6 (7 also on 5) · FR-8,9→6 · FR-9,10,13→7 · FR-10,14→(8,9) · FR-15→(4,6) · FR-16→10 · FR-17→11 · FR-18→12 · FR-24→9 · FR-25→13.
+- FR-26→14 · FR-27→(1,13) · FR-1→(2,3) · FR-2→4 · FR-3→2 · FR-4→(4,5) · FR-5,6,7→6 (7 also on 5) · FR-8,9→6 · FR-9,10,13→7 · FR-10,14→(8,9) · FR-15→(4,6) · FR-16→10 · FR-17→11 · FR-18→12 · FR-24→9 · FR-25→13.
 - Operator-only FRs (FR-11, FR-12, FR-19–FR-23) map to the admin area, intentionally out of scope for screens.
 - No customer FR is orphaned; no customer surface lacks a reachable entry.
 
@@ -101,14 +104,15 @@ Behavioral only — every visual spec (fill, radius, type ramp) lives in `DESIGN
 
 | Component | Behavioral rules |
 |---|---|
-| **Top nav + language toggle** | Sticky on scroll. Holds Home/Shop/Portfolio/About/Contact + cart + EN\|VN. Toggle flips the whole UI language in place, **stays on the current surface** (no reload to Home), persists the choice for the session, and sets `lang=vi`/`lang=en` on the document. Cart shows a live item-count indicator (no count when empty). On `< md`, links collapse into a menu (see Responsive). CTA fills use `{colors.sky-deep}`. |
+| **Top nav + language toggle** | Sticky on scroll. Holds Portfolio/Achievements/About/Contact/Shop + EN\|VN (wordmark → Home). Toggle flips the whole UI language in place, **stays on the current surface** (no reload to Home), persists the choice for the session, and sets `lang=vi`/`lang=en` on the document. The cart indicator renders **only when the cart has ≥ 1 item** (with a live count); Account sign-in is in the footer and on Shop surfaces, not the top bar. On `< md`, links collapse into a menu (see Responsive). CTA fills use `{colors.sky-deep}`. |
 | **Product card** | Image leads (photo fills the top; frame and radius are DESIGN's — see `product-card`). Shows Product name (`{typography.h3}`), species+location caption (`{typography.caption}` in `{colors.caption-deep}`), a from-price in VND (`{typography.body}`), and a type tag (Print / Digital / Both) in `{colors.sage-deep}`. Whole card is one click target → Product detail. No hover-only affordances on touch. |
 | **Variant selector** | Two axes on a dual Product: **Physical Print size** (A4 / A3 / A2) and **Digital tier** (**Web-res / Print-res**) `[ASSUMPTION: exact tier names/count pending PRD Open Question 4]`. Selecting a Variant **updates the displayed price** and **updates shipping applicability**: choosing a Physical Print marks the line shipping-relevant; choosing a Digital Download marks it shipping-exempt and pins **quantity to 1**. Unpublished Products never render this control. |
 | **Watermarked preview** | Digital tiers display a **watermarked** image only; the un-watermarked file is never delivered to the client before purchase (FR-2, counter-metric SM-C2). Lightbox-zoomable but still watermarked. Physical Prints show the clean display image (the deliverable is the print, not the file). |
 | **Cart line** | Shows thumbnail, name, Variant label, unit price, qty stepper, line total (VND). **Digital lines lock qty at 1** — the stepper is disabled with the note "Digital images are sold once per order" / "Ảnh số chỉ bán một bản mỗi đơn". Remove control per line; removing the last line → empty-cart state. |
 | **Checkout payment selector** | Radio set of enabled methods: **VietQR (payOS)** and **COD** (Momo/ZaloPay wallets deferred post-launch). **Hides the shipping step entirely** for digital-only carts (FR-6). **Disables COD** for any cart containing a Digital Download, with an inline reason: "COD isn't available for digital images" / "COD không áp dụng cho ảnh số" (FR-8). VietQR shows a QR code + Order reference on submit; the Order auto-confirms *Paid* via the payOS webhook. |
 | **Status pill** | Compact pill on `{colors.surface-sunken}` with a **leading colored dot + an `{colors.ink}` label** (the label is never the status hue — that fails AA on the sunken pill; the dot carries the color). Dot maps 1:1 to Order Status: `{colors.success}` = Paid/Completed; `{colors.pending}` = Pending Payment / Awaiting transfer / Processing; `{colors.info}` = Shipped; `{colors.error}` = Cancelled/Failed. The label text is bilingual per the toggle and carries the meaning for colorblind users (never color alone). |
-| **Gallery grid** | Masonry/asymmetric grid of portfolio images. Tap/click opens a **lightbox** (overlay uses `{shadows.overlay}`); arrow keys and swipe move between images, `Esc` closes. If an image is linked to a Product, the lightbox shows a "View this print" / "Xem bản in này" action → Product detail. Not all gallery images are for sale. |
+| **Gallery grid** | Portfolio is two-level: gallery groups (e.g. *Chim Việt Nam* / *Chim Thế Giới*) → Galleries (site, park or country); each group shows a "View all / Xem tất cả" entry. Masonry/asymmetric grid of portfolio images. Visible captions show **both species names** ("Bồng chanh đỏ · Black-backed Kingfisher") + location in every locale; portfolio display images carry **no watermark**. Tap/click opens a **lightbox** (overlay uses `{shadows.overlay}`); arrow keys and swipe move between images, `Esc` closes. If an image is linked to a Product, the lightbox shows a "View this print" / "Xem bản in này" action → Product detail. Not all gallery images are for sale. |
+| **Achievement entry** | A quiet list/card: meta line (year · organiser / venue / outlet), title (`{typography.h3}`), optional one-paragraph description or press excerpt, optional thumbnail (reserved ratio), optional external link ("Read more" / "Xem thêm", new tab, `aria-label` names the destination). Grouped under `{typography.h2}` kind headings — Awards & competitions · Exhibitions · Publications & press · Honours & memberships; empty groups hidden. No trophy icons or badges — the record speaks for itself. |
 | **Forms** | (register, login, address, contact, guest order-lookup) Every field has a visible label (never placeholder-only). Inline validation on blur and on submit; errors sit beneath the field in `{colors.error}` with text, not color alone. Primary submit uses `{colors.sky-deep}`; disabled while a required field is invalid or a request is in flight. |
 
 ## State Patterns
@@ -118,7 +122,7 @@ Status colors are used semantically: `{colors.success}` (delivered/paid), `{colo
 | State | Surface | Treatment |
 |---|---|---|
 | **Empty cart** | Cart | "Your cart is empty" / "Giỏ hàng của bạn đang trống", quiet illustration, single link → Shop ("Continue shopping" / "Tiếp tục mua sắm"). Never a dead end. |
-| **Loading (image-heavy)** | Home, Catalog, Collection, Portfolio | Skeleton blocks sized to the grid resolve into images; images lazy-load below the fold with low-quality placeholders → full asset (see Responsive). Layout never reflows/jumps as images arrive (reserved aspect ratios). |
+| **Loading (image-heavy)** | Home, Portfolio, Achievements, Catalog, Collection | Skeleton blocks sized to the grid resolve into images; images lazy-load below the fold with low-quality placeholders → full asset (see Responsive). Layout never reflows/jumps as images arrive (reserved aspect ratios). |
 | **Made-to-order availability** | Product detail, Product card | Physical Prints are **always purchasable while published** — copy is "Made to order" / "Đặt in theo yêu cầu" with a handling note, **never "out of stock"** and never a stock count (FR-2). Unpublished Products simply do not appear. |
 | **Payment pending — bank transfer** | Order confirmation, Order status | Order Status = *Pending Payment*, status pill "Awaiting transfer" / "Chờ chuyển khoản" in `{colors.pending}`. VietQR code + Order reference shown; the Order is held until the payOS webhook confirms the transfer (usually seconds), then flips to *Paid* (FR-9). Nothing is delivered/shipped until *Paid*. |
 | **Payment placed — COD** | Order confirmation, Order status | Physical-only COD Order is placed as *Processing*; pill "Processing" / "Đang xử lý". Copy: pay the courier on delivery; Operator marks Paid on cash receipt (FR-8). |
@@ -153,9 +157,26 @@ Behavioral floor; visual contrast is proven in `DESIGN.md`. **All text/CTA token
 
 ## Key Flows
 
-Named-protagonist journeys mirroring PRD UJ-1, UJ-2, UJ-3 verbatim in intent.
+Named-protagonist journeys mirroring PRD UJ-1, UJ-2, UJ-3 (revised 2026-10-29: the portfolio journey is primary).
 
-### Flow 1 — Lan buys a framed-worthy kingfisher print, pays by VietQR (UJ-1)
+### Flow 1 — A visitor discovers Sam Thuong's work (UJ-1, primary)
+
+**Entry state:** a visitor (e.g. Hà, a nature-magazine editor) lands on **Home** from a shared link, on her phone.
+
+1. Home opens on a full-bleed photograph, then one featured grid per gallery group; she taps "View all / Xem tất cả" into **Portfolio**.
+2. She opens a Gallery (e.g. *Chim Việt Nam → Tràm Chim*) and steps through images in the **lightbox** (keyboard/swipe navigation); captions name each bird in Vietnamese and English.
+3. She opens **Achievements** and scans awards, exhibitions, publications and honours.
+4. She reads Sam Thuong's short bilingual bio on **About**.
+5. **CLIMAX:** she recognises a serious professional — the work and its recognition, seen together within a minute.
+6. **Resolution:** she uses **Contact** (enquiry type: licensing) to ask about using an image in an article.
+- **Branch:** another visitor admires "Sarus Crane at Tràm Chim" / "Sếu đầu đỏ ở Tràm Chim" in the lightbox and taps **"View this print" / "Xem bản in này"** → Product detail (Flow 2).
+- **Edge case:** an image with no linked Product simply shows no purchase action — the lightbox stays a viewing surface, no dead "buy" affordance.
+
+*Surfaces:* 1 → 10 → 14 → 11 → 12 (or → 4). *Components:* gallery grid + lightbox, achievement entry, product link.
+
+### Flow 2 — Lan buys a framed-worthy kingfisher print (UJ-2, secondary)
+
+*Pays by COD at launch; the VietQR steps below apply once online payment is enabled (post-launch shop phase).*
 
 **Entry state:** Lan, an amateur birdwatcher in Hanoi, unauthenticated, on her phone, arriving from a social link straight to a **Product detail** page.
 
@@ -171,7 +192,7 @@ Named-protagonist journeys mirroring PRD UJ-1, UJ-2, UJ-3 verbatim in intent.
 
 *Surfaces:* 4 → 5 → 6 → 7 (→ 8). *Components:* variant selector, cart line, checkout payment selector, status pill.
 
-### Flow 2 — Minh buys and downloads a digital heron image (UJ-2)
+### Flow 3 — Minh buys and downloads a digital heron image (UJ-3, secondary — enabled once digital delivery ships)
 
 **Entry state:** Minh, unauthenticated, on desktop, browsing a **Collection** ("Wetland Herons" / "Diệc vùng đầm lầy").
 
@@ -185,19 +206,6 @@ Named-protagonist journeys mirroring PRD UJ-1, UJ-2, UJ-3 verbatim in intent.
 - **Edge case:** if the Download Link expires, he requests a **fresh link** via his Order reference (guest) or re-downloads from Account order history — no re-purchase.
 
 *Surfaces:* 3 → 4 → 5 → 6 → 7 (→ 8/9). *Components:* watermarked preview, variant selector, checkout payment selector, status pill.
-
-### Flow 3 — A visitor evaluates Sam Thuong's work (UJ-3, lighter)
-
-**Entry state:** a potential buyer/collaborator lands on **Home** from a shared link.
-
-1. Home leads with photography and a portfolio teaser; the visitor taps into **Portfolio**.
-2. They browse the **gallery grid** and open images in the **lightbox** (keyboard/swipe navigation).
-3. They read Sam Thuong's short bilingual bio on **About**, forming an impression of his professionalism.
-4. **CLIMAX:** a gallery image they admire — "Sarus Crane at Tràm Chim" / "Sếu đầu đỏ ở Tràm Chim" — carries a **"View this print" / "Xem bản in này"** link; the showcase converts to a buyable **Product detail** without leaving the story. The portfolio has done its job: browsing becomes buying (or contacting).
-5. **Resolution:** they either add a Product to cart (entering Flow 1/2) or use **Contact** to reach him (FR-18).
-- **Edge case:** an image with no linked Product simply shows no purchase action — the lightbox stays a viewing surface, no dead "buy" affordance.
-
-*Surfaces:* 1 → 10 → 11 → (4 or 12). *Components:* gallery grid + lightbox, product link.
 
 ## Responsive & Platform
 
